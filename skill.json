@@ -2,27 +2,37 @@
   "manifest": {
     "publishingInformation": {
       "locales": {
-        "en-US": {
-          "summary": "Sample Short Description",
+        "ja-JP": {
+          "summary": "backspace.fmのエピソードを再生するスキルです。",
           "examplePhrases": [
-            "Alexa open hello world",
-            "Alexa tell hello world hello",
-            "Alexa ask hello world say hello"
+            "アレクサ、バックスペースエフエムを開いて",
+            "アレクサ、バックスペースエフエムを再生して",
+            "アレクサ、バックスペースエフエムで最新のエピソードを再生して"
           ],
           "name": "backspace.fm",
-          "description": "Sample Full Description"
+          "description": "backspace.fmのエピソードを再生するスキルです。 "
         }
       },
       "isAvailableWorldwide": true,
       "testingInstructions": "Sample Testing Instructions.",
-      "category": "EDUCATION_AND_REFERENCE",
+      "category": "PODCAST",
       "distributionCountries": []
+    },
+    "privacyAndCompliance": {
+      "allowsPurchases": false,
+      "usesPersonalInfo": false,
+      "isChildDirected": false,
+      "isExportCompliant": true,
+      "containsAds": false
     },
     "apis": {
       "custom": {
         "endpoint": {
           "sourceDir": "lambda/custom"
-        }
+        },
+        "interfaces": [
+          { "type": "AUDIO_PLAYER" }
+        ]
       }
     },
     "manifestVersion": "1.0"
