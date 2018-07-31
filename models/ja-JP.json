@@ -1,0 +1,91 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "バックスペースエフエム",
+      "intents": [
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.PauseIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ResumeIntent",
+          "samples": []
+        },
+				{
+          "name": "PlayPodcastIntent",
+          "slots": [],
+          "samples": [
+            "再生して",
+            "再生",
+            "開いて",
+            "かけて",
+            "聞かせて",
+            "エピソードを再生して"
+          ]
+        },
+        {
+          "name": "PlayPodcastByIndexIntent",
+          "slots": [
+            {
+              "name": "indexOfEpisodes",
+              "type": "AMAZON.NUMBER",
+              "samples": []
+            }
+          ],
+          "samples": [
+            "{indexOfEpisodes} 番目",
+            "{indexOfEpisodes} 番目を再生して",
+            "{indexOfEpisodes} 番を再生して",
+            "{indexOfEpisodes} 番再生",
+            "{indexOfEpisodes} 番目のエピソードを再生して"
+          ]
+        },
+        {
+          "name": "FastforwardIntent",
+          "slots": [
+            {
+              "name": "skipMinutes",
+              "type": "AMAZON.NUMBER",
+              "samples": [ ]
+            }
+          ],
+          "samples": [
+            "{skipMinutes} 分飛ばして",
+            "{skipMinutes} 分すすめて",
+            "{skipMinutes} 分早送り",
+            "{skipMinutes} 分スキップ"
+          ]
+        },
+        {
+          "name": "RewindIntent",
+          "slots": [
+            {
+              "name": "skipMinutes",
+              "type": "AMAZON.NUMBER",
+              "samples": [ ]
+            }
+          ],
+          "samples": [
+            "{skipMinutes} 分もどして",
+            "{skipMinutes} 分もどって",
+            "{skipMinutes} 分巻き戻し",
+            "{skipMinutes} 分後戻り",
+            "{skipMinutes} 分バック"
+          ]
+        }
+      ]
+    }
+  }
+}

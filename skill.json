@@ -3,14 +3,14 @@
     "publishingInformation": {
       "locales": {
         "ja-JP": {
-          "summary": "backspace.fmのエピソードを再生するスキルです。",
+          "summary": "backspace.fmのエピソードを再生する【非公式】スキルです。",
           "examplePhrases": [
             "アレクサ、バックスペースエフエムを開いて",
             "アレクサ、バックスペースエフエムを再生して",
             "アレクサ、バックスペースエフエムで最新のエピソードを再生して"
           ],
-          "name": "backspace.fm",
-          "description": "backspace.fmのエピソードを再生するスキルです。 "
+          "name": "backspace.fm プレイヤー",
+          "description": "backspace.fmのエピソードを再生する【非公式】スキルです。 "
         }
       },
       "isAvailableWorldwide": true,

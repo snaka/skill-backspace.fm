@@ -1,19 +1,41 @@
 {
   "deploy_settings": {
     "default": {
-      "skill_id": "",
+      "skill_id": "amzn1.ask.skill.822402de-6e44-4471-8e77-b350f0ec8e44",
       "was_cloned": false,
       "merge": {
         "manifest": {
           "apis": {
             "custom": {
               "endpoint": {
-                "uri": "ask-custom-backspace.fm-default"
+                "uri": "ask-custom-backspace-fm-default"
               }
             }
           }
         }
-      }
+      },
+      "resources": {
+        "manifest": {
+          "eTag": "971a811925b6199e359fe307fea56d56"
+        },
+        "interactionModel": {
+          "ja-JP": {
+            "eTag": "c1e23f6191090a61871d4a8b1980b5f1"
+          }
+        },
+        "lambda": [
+          {
+            "arn": "arn:aws:lambda:us-east-1:105394972992:function:ask-custom-backspace-fm-default",
+            "functionName": "ask-custom-backspace-fm-default",
+            "awsRegion": "us-east-1",
+            "alexaUsage": [
+              "custom/default"
+            ],
+            "revisionId": "ab5e1d28-8e19-412e-a063-41a2e74ba5aa"
+          }
+        ]
+      },
+      "in_skill_products": []
     }
   }
 }

@@ -10,6 +10,9 @@
   "license": "ISC",
   "dependencies": {
     "ask-sdk-core": "^2.0.0",
-    "ask-sdk-model": "^1.0.0"
+    "ask-sdk-model": "^1.0.0",
+    "aws-sdk": "^2.283.1",
+    "node-feedparser": "^1.0.1",
+    "request": "^2.87.0"
   }
 }
