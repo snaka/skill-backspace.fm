@@ -58,6 +58,27 @@ const PlayPodcastByIndexIntentHandler = {
   }
 };
 
+const StartOverIntentHandler = {
+ canHandle(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+
+    return request.type === 'IntentRequest'
+      && request.intent.name === 'AMAZON.StartOverIntent';
+  },
+  async handle(handlerInput) {
+    const token = handlerInput.requestEnvelope.context.AudioPlayer.token;
+    const { _id, index } = parseToken(token);
+    const episode = await podcast.getEpisodeInfo(constants.PODCAST_ID, index);
+
+    console.log(`START OVER: token ${token}`);
+
+    return handlerInput.responseBuilder
+      .speak(`先頭から再生します`)
+      .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, token, 0)
+      .getResponse();
+  }
+};
+
 const FastforwardIntentHandler = {
   canHandle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
@@ -141,8 +162,22 @@ const CancelAndStopIntentHandler = {
     const offset = handlerInput.requestEnvelope.context.AudioPlayer.offsetInMilliseconds;
     console.log(`STOP: token ${token} offset ${offset}`);
 
+    const request = handlerInput.requestEnvelope.request;
+    let speechText;
+    switch(request.intent.name) {
+      case 'AMAZON.CancelIntent':
+        speechText = 'キャンセルします';
+        break;
+      case 'AMAZON.StopIntent':
+        speechText = '停止します';
+        break;
+      case 'AMAZON.PauseIntent':
+        speechText = '一時停止します';
+        break;
+    }
+
     return handlerInput.responseBuilder
-      .speak('一時停止します')
+      .speak(speechText)
       .addAudioPlayerStopDirective()
       .getResponse();
   }
@@ -230,6 +265,24 @@ const PreviousIntentHandler = {
       .speak(speechText)
       .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, nextToken, 0)
       .withSimpleCard(`${constants.PODCAST_NAME} の ${nextIndex + 1} 番目のエピソード`, speechText)
+      .getResponse();
+  }
+}
+
+const UnsupportedIntentHandler = {
+  canHandle(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+
+    return request.type === 'IntentRequest' && (
+      request.intent.name === 'AMAZON.LoopOnIntent' ||
+      request.intent.name === 'AMAZON.LoopOffIntent' ||
+      request.intent.name === 'AMAZON.RepeatIntent' ||
+      request.intent.name === 'AMAZON.ShuffleOnIntent' ||
+      request.intent.name === 'AMAZON.ShuffleOffIntent');
+  },
+  handle(handlerInput) {
+    return handlerInput.responseBuilder
+      .speak('すみません、その操作には対応していません')
       .getResponse();
   }
 }
@@ -331,6 +384,7 @@ exports.handler = skillBuilder
   .addRequestHandlers(
     PlayPodcastIntentHandler,
     PlayPodcastByIndexIntentHandler,
+    StartOverIntentHandler,
     FastforwardIntentHandler,
     RewindIntentHandler,
     HelpIntentHandler,
@@ -338,6 +392,7 @@ exports.handler = skillBuilder
     ResumeIntentHandler,
     NextIntentHandler,
     PreviousIntentHandler,
+    UnsupportedIntentHandler,
     AudioPlayerEventHandler,
     SessionEndedRequestHandler,
     SystemExceptionHandler
