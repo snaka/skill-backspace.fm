@@ -158,23 +158,29 @@ const CancelAndStopIntentHandler = {
         || request.intent.name === 'AMAZON.PauseIntent');
   },
   handle(handlerInput) {
+    console.log(handlerInput.requestEnvelope.context.AudioPlayer);
+
+    const playerActivity = handlerInput.requestEnvelope.context.AudioPlayer.playerActivity;
     const token = handlerInput.requestEnvelope.context.AudioPlayer.token;
     const offset = handlerInput.requestEnvelope.context.AudioPlayer.offsetInMilliseconds;
-    console.log(`STOP: token ${token} offset ${offset}`);
 
     const request = handlerInput.requestEnvelope.request;
     let speechText;
+    if (playerActivity === 'PLAYING') {
+      return handlerInput.responseBuilder
+        .addAudioPlayerStopDirective()
+        .getResponse();
+    }
+
     switch(request.intent.name) {
       case 'AMAZON.CancelIntent':
-        speechText = 'キャンセルします';
-        break;
       case 'AMAZON.StopIntent':
+      case 'AMAZON.PauseIntent':
         speechText = '停止します';
         break;
-      case 'AMAZON.PauseIntent':
-        speechText = '一時停止します';
-        break;
     }
+
+    console.log(`STOP: token ${token} offset ${offset} intent ${request.intent.name}`);
 
     return handlerInput.responseBuilder
       .speak(speechText)
