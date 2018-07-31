@@ -16,11 +16,11 @@
       },
       "resources": {
         "manifest": {
-          "eTag": "6db1a4d7af1acdc7a70f4ea8e114c59e"
+          "eTag": "82c23d538b0df719f28b05ceccdbdd9d"
         },
         "interactionModel": {
           "ja-JP": {
-            "eTag": "c1e23f6191090a61871d4a8b1980b5f1"
+            "eTag": "bbee89c42af0d25260e664bda77b1541"
           }
         },
         "lambda": [

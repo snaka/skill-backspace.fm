@@ -32,7 +32,8 @@
             "開いて",
             "かけて",
             "聞かせて",
-            "エピソードを再生して"
+            "エピソードを再生して",
+            "エピソード"
           ]
         },
         {
@@ -46,10 +47,12 @@
           ],
           "samples": [
             "{indexOfEpisodes} 番目",
+            "{indexOfEpisodes} 番目ひらいて",
             "{indexOfEpisodes} 番目を再生して",
             "{indexOfEpisodes} 番を再生して",
             "{indexOfEpisodes} 番再生",
-            "{indexOfEpisodes} 番目のエピソードを再生して"
+            "{indexOfEpisodes} 番目のエピソードを再生して",
+            "{indexOfEpisodes} 番目のエピソード"
           ]
         },
         {
