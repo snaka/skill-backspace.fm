@@ -18,13 +18,13 @@ const PlayPodcastIntentHandler = {
     const token = createToken(constants.PODCAST_ID, 0);
     const episode = await podcast.getEpisodeInfo(constants.PODCAST_ID, 0);
     console.log('episode: ', episode);
-    const speechText = `${constants.PODCAST_NAME_LOCALIZED}の最新エピソード「${episode.title}」を再生します`;
+    const speechText = `${constants.PODCAST_NAME_LOCALIZED} の最新エピソード「${episode.title}」を再生します`;
     const cardText = `${constants.PODCAST_NAME} の最新エピソード「${episode.title}」を再生します`;
 
     return handlerInput.responseBuilder
       .speak(speechText)
       .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, token, 0)
-      .withSimpleCard(`${constants.PODCAST_NAME} 最新エピソード`, speechText)
+      .withSimpleCard(`${constants.PODCAST_NAME} の最新エピソード`, speechText)
       .getResponse();
   }
 };
@@ -38,17 +38,17 @@ const PlayPodcastByIndexIntentHandler = {
     console.log('PLAY PODCAST WITH EPISODE NO.');
 
     const index = util.getSlotValueAsInt(handlerInput.requestEnvelope, 'indexOfEpisodes');
-    if (index < 0 || index > 5) {
-      const speechText = 'ごめんなさい、最近の5エピソードまでしか対応していません。';
+    if (index < 0 || index > constants.MAX_EPISODE_COUNT) {
+      const speechText = `ごめんなさい、今は最近の${constants.MAX_EPISODE_COUNT}エピソードまでしか対応していません。`;
       return handlerInput.responseBuilder
         .speak(speechText)
         .withSimpleCard('対応していないエピソード', speechText)
         .getResponse();
     }
-    const episode = await podcast.getEpisodeInfo(podcastId, index - 1);
+    const episode = await podcast.getEpisodeInfo(constants.PODCAST_ID, index - 1);
     const token = createToken(constants.PODCAST_ID, index - 1);
     const speechText = `${constants.PODCAST_NAME_LOCALIZED} の ${index} 番目のエピソード「${episode.title}」を再生します`;
-    const cardText = `${onstants.PODCAST_NAME} の ${index} 番目のエピソード「${episode.title}」を再生します`;
+    const cardText = `${constants.PODCAST_NAME} の ${index} 番目のエピソード「${episode.title}」を再生します`;
 
     return handlerInput.responseBuilder
       .speak(speechText)
@@ -159,14 +159,8 @@ const ResumeIntentHandler = {
 
     const token = handlerInput.requestEnvelope.context.AudioPlayer.token;
     const offset = handlerInput.requestEnvelope.context.AudioPlayer.offsetInMilliseconds;
-    const {
-      podcastId,
-      index
-    } = parseToken(token);
-    const episode = await podcast.getEpisodeInfo(podcastId, index);
-
-    console.log(`RESUME: token ${token} offset ${offset}`);
-    console.log(`parse token: ${podcastId}, ${index}`);
+    const { _id, index } = parseToken(token);
+    const episode = await podcast.getEpisodeInfo(constants.PODCAST_ID, index);
 
     return handlerInput.responseBuilder
       .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, token, offset)
@@ -186,7 +180,7 @@ const NextIntentHandler = {
     const { _id, index } = parseToken(token);
 
     const nextIndex = index + 1;
-    if (nextIndex >= 5) {
+    if (nextIndex >= constants.MAX_EPISODE_COUNT) {
       return handlerInput.responseBuilder
         .speak('次のエピソードはありません')
         .getResponse();
@@ -202,7 +196,7 @@ const NextIntentHandler = {
     return handlerInput.responseBuilder
       .speak(speechText)
       .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, nextToken, 0)
-      .withSimpleCard('エピソード', speechText)
+      .withSimpleCard(`${constants.PODCAST_NAME} の ${nextIndex + 1} 番目のエピソード`, speechText)
       .getResponse();
   }
 }
@@ -235,7 +229,7 @@ const PreviousIntentHandler = {
     return handlerInput.responseBuilder
       .speak(speechText)
       .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, nextToken, 0)
-      .withSimpleCard('エピソード', speechText)
+      .withSimpleCard(`${constants.PODCAST_NAME} の ${nextIndex + 1} 番目のエピソード`, speechText)
       .getResponse();
   }
 }
