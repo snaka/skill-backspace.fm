@@ -10,7 +10,9 @@
             "アレクサ、バックスペースエフエムで最新のエピソードを再生して"
           ],
           "name": "backspace.fm プレイヤー",
-          "description": "backspace.fmのエピソードを再生する【非公式】スキルです。 "
+          "description": "backspace.fmのエピソードを再生する【非公式】スキルです。 ",
+          "smallIconUri": "https://s3.amazonaws.com/skill-backspace.fm/backspace-fm-skill-logo-108.png",
+          "largeIconUri": "https://s3.amazonaws.com/skill-backspace.fm/backspace-fm-skill-logo-512.png"
         }
       },
       "isAvailableWorldwide": true,
