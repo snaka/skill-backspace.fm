@@ -52,7 +52,7 @@ async function fetchHead(url) {
 async function saveToCache(podcastId, episodes, headers) {
   const timeStamp = Math.floor((new Date()).getTime() / 1000);
   try {
-    console.log(`saveToCache: ${podcastId} , ${JSON.stringify(episodes)} => ${constants.TABLE_NAME}`);
+    console.log(`saveToCache: ${podcastId} => ${constants.TABLE_NAME}`);
     await dynamoDb.put({
       TableName: constants.TABLE_NAME,
       Item: { podcastId, episodes, timeStamp, headers }
@@ -66,7 +66,7 @@ async function restoreFromCache(podcastId, etag) {
   try {
     console.log(`restoreFromCache: ${constants.TABLE_NAME} ${podcastId}`);
     const restored = await dynamoDb.get({ TableName: constants.TABLE_NAME, Key: { podcastId } }).promise();
-    console.log(`restored: ${JSON.stringify(restored)}`);
+    //console.log(`restored: ${JSON.stringify(restored)}`);
     if (restored.Item.headers.etag !== etag) {
       console.log(`ETag changed cache:${restored.Item.headers.etag} !== current:${etag}`);
       return undefined;

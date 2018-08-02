@@ -38,7 +38,7 @@ const PlayPodcastByIndexIntentHandler = {
     console.log('PLAY PODCAST WITH EPISODE NO.');
 
     const index = util.getSlotValueAsInt(handlerInput.requestEnvelope, 'indexOfEpisodes');
-    if (index < 0 || index > constants.MAX_EPISODE_COUNT) {
+    if (index < 1 || index > constants.MAX_EPISODE_COUNT) {
       const speechText = `ごめんなさい、今は最近の${constants.MAX_EPISODE_COUNT}エピソードまでしか対応していません。`;
       return handlerInput.responseBuilder
         .speak(speechText)
