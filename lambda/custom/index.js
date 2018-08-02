@@ -140,9 +140,8 @@ const HelpIntentHandler = {
   },
   handle(handlerInput) {
     console.log('HELP');
-    const speechText = 'バックスペースエフエムプレイヤーではバックスペースエフエムのエピソードを再生することができます。どのエピソードが聞きたいですか？\n \
-たとえば「最新のエピソード」または「２番目のエピソード」と話しかけてみてください';
-    const repromptText = 'たとえば「最新のエピソード」または「２番目のエピソード」と話しかけてみてください';
+    const speechText = `バックスペースエフエムプレイヤーではバックスペースエフエムで配信中の最新から${constants.MAX_EPISODE_COUNT}番目のエピソードを聴くことができます。何番目のエピソードが聴きたいですか？`;
+    const repromptText = '何番目のエピソードが聴きたいですか？';
 
     return handlerInput.responseBuilder
       .speak(speechText)

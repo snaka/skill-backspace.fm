@@ -162,12 +162,49 @@ describe('ヘルプ', () => {
   alexaTest.test([
     {
       request: alexaTest.getIntentRequest('AMAZON.HelpIntent'),
-      saysLike: 'どのエピソードが聞きたいですか？',
-      repromptsLike: 'と話しかけてみてください',
+      saysLike: 'バックスペースエフエムで配信中の最新から100番目のエピソードを聴くことができます',
+      repromptsLike: '何番目のエピソードが聴きたいですか？',
       shouldEndSession: false,
       hasCardTitle: 'backspace.fm プレイヤーについて',
     }
   ]);
+});
 
+describe('キャンセル', () => {
+  const intents = ['AMAZON.CancelIntent'];
+
+  intents.forEach((intent) => {
+    context(`インテントが ${intent}`, () => {
+      context('再生中', () => {
+        const request = alexaTest.getIntentRequest(intent);
+        alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:0', 60000, 'PLAYING');
+
+        alexaTest.test([
+          {
+            request,
+            saysNothing: true,
+            repromptsNothing: true,
+            shouldEndSession: true,
+            stopStream: true,
+          }
+        ]);
+      });
+
+      context('停止中', () => {
+        const request = alexaTest.getIntentRequest(intent);
+        alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:0', 60000, 'PAUSED');
+
+        alexaTest.test([
+          {
+            request,
+            saysLike: '停止します',
+            repromptsNothing: true,
+            shouldEndSession: true,
+            stopStream: true,
+          }
+        ]);
+      });
+    });
+  });
 });
 
