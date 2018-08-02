@@ -39,9 +39,12 @@ const PlayPodcastByIndexIntentHandler = {
 
     const index = util.getSlotValueAsInt(handlerInput.requestEnvelope, 'indexOfEpisodes');
     if (index < 1 || index > constants.MAX_EPISODE_COUNT) {
-      const speechText = `ごめんなさい、今は最近の${constants.MAX_EPISODE_COUNT}エピソードまでしか対応していません。`;
+      console.log('INVALID INDEX:', index);
+      const speechText = `ごめんなさい、最近の${constants.MAX_EPISODE_COUNT}エピソードまでしか対応していません。何番目のエピソードが聴きたいですか？`;
+      const repromptText = '何番目のエピソードが聴きたいですか？';
       return handlerInput.responseBuilder
         .speak(speechText)
+        .reprompt(repromptText)
         .withSimpleCard('対応していないエピソード', speechText)
         .getResponse();
     }

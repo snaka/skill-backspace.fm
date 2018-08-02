@@ -64,6 +64,8 @@ describe('番号指定でエピソードを再生', () => {
       {
         request: alexaTest.getIntentRequest('PlayPodcastByIndexIntent', { indexOfEpisodes: 3 }),
         saysLike: 'バックスペースエフエム の 3 番目のエピソード',
+        repromptsNothing: true,
+        shouldEndSession: true,
         playsStream: {
           behavior: 'REPLACE_ALL',
           token: 'backspace.fm:2',
@@ -78,7 +80,10 @@ describe('番号指定でエピソードを再生', () => {
     alexaTest.test([
       {
         request: alexaTest.getIntentRequest('PlayPodcastByIndexIntent', { indexOfEpisodes: 0 }),
-        saysLike: '最近の100エピソードまでしか対応していません'
+        saysLike: '最近の100エピソードまでしか対応していません',
+        repromptsLike: '何番目のエピソードが聴きたいですか？',
+        repromptsNothing: false,
+        shouldEndSession: false,
       }
     ]);
   });
@@ -87,7 +92,10 @@ describe('番号指定でエピソードを再生', () => {
     alexaTest.test([
       {
         request: alexaTest.getIntentRequest('PlayPodcastByIndexIntent', { indexOfEpisodes: 0 }),
-        saysLike: '最近の100エピソードまでしか対応していません'
+        saysLike: '最近の100エピソードまでしか対応していません',
+        repromptsLike: '何番目のエピソードが聴きたいですか？',
+        repromptsNothing: false,
+        shouldEndSession: false,
       }
     ]);
   });
@@ -101,6 +109,7 @@ describe('先頭からを指示', () => {
     {
       request,
       saysLike: '先頭から再生します',
+      shouldEndSession: true,
       playsStream: {
         behavior: 'REPLACE_ALL',
         token: 'backspace.fm:2',
@@ -109,5 +118,56 @@ describe('先頭からを指示', () => {
       }
     }
   ]);
+});
+
+describe('早送り', () => {
+  const request = alexaTest.getIntentRequest('FastforwardIntent', { 'skipMinutes': 5 });
+  alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:0', 60000);
+
+  alexaTest.test([
+    {
+      request,
+      saysLike: '5分進めます',
+      shouldEndSession: true,
+      playsStream: {
+        behavior: 'REPLACE_ALL',
+        token: 'backspace.fm:0',
+        url: 'https://tracking.feedpress.it/link/6091/9900270/backspace-d032.mp3',
+        offset: 360000
+      }
+    }
+  ]);
+});
+
+describe('巻き戻し', () => {
+  const request = alexaTest.getIntentRequest('RewindIntent', { 'skipMinutes': 5 });
+  alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:0', 360000);
+
+  alexaTest.test([
+    {
+      request,
+      saysLike: '5分戻ります',
+      shouldEndSession: true,
+      playsStream: {
+        behavior: 'REPLACE_ALL',
+        token: 'backspace.fm:0',
+        url: 'https://tracking.feedpress.it/link/6091/9900270/backspace-d032.mp3',
+        offset: 60000
+      }
+    }
+  ]);
+});
+
+describe('ヘルプ', () => {
+  alexaTest.test([
+    {
+      request: alexaTest.getIntentRequest('AMAZON.HelpIntent'),
+      saysLike: 'どのエピソードが聞きたいですか？',
+      repromptsLike: 'と話しかけてみてください',
+      shouldEndSession: false,
+      hasCardTitle: 'backspace.fm プレイヤーについて',
+    }
+  ]);
+
 });
 
