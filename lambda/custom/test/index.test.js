@@ -171,7 +171,11 @@ describe('ヘルプ', () => {
 });
 
 describe('キャンセル', () => {
-  const intents = ['AMAZON.CancelIntent'];
+  const intents = [
+    'AMAZON.CancelIntent',
+    'AMAZON.StopIntent',
+    'AMAZON.PauseIntent',
+  ];
 
   intents.forEach((intent) => {
     context(`インテントが ${intent}`, () => {
@@ -204,6 +208,119 @@ describe('キャンセル', () => {
           }
         ]);
       });
+    });
+  });
+});
+
+describe('レジューム', () => {
+  const request = alexaTest.getIntentRequest('AMAZON.ResumeIntent');
+  alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:0', 60000, 'PAUSED');
+
+  alexaTest.test([
+    {
+      request,
+      saysNothing: true,
+      shouldEndSession: true,
+      playsStream: {
+        behavior: 'REPLACE_ALL',
+        token: 'backspace.fm:0',
+        url: 'https://tracking.feedpress.it/link/6091/9900270/backspace-d032.mp3',
+        offset: 60000
+      }
+    }
+  ]);
+});
+
+describe('次へ', () => {
+  context('最後のエピソードではない', () => {
+    const request = alexaTest.getIntentRequest('AMAZON.NextIntent');
+    alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:0', 60000, 'PLAYING');
+
+    alexaTest.test([
+      {
+        request,
+        saysLike: '2番目のエピソード',
+        shouldEndSession: true,
+        playsStream: {
+          behavior: 'REPLACE_ALL',
+          token: 'backspace.fm:1',
+          url: 'https://tracking.feedpress.it/link/6091/9882954/backspace-256.mp3',
+          offset: 0
+        }
+      }
+    ]);
+  });
+
+  context('最後のエピソード', () => {
+    const request = alexaTest.getIntentRequest('AMAZON.NextIntent');
+    alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:99', 60000, 'PLAYING');
+
+    alexaTest.test([
+      {
+        request,
+        saysLike: '次のエピソードはありません',
+        shouldEndSession: true,
+        playsStoped: true,
+      }
+    ]);
+  });
+});
+
+describe('前へ', () => {
+  context('最初のエピソードではない', () => {
+    const request = alexaTest.getIntentRequest('AMAZON.PreviousIntent');
+    alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:1', 60000, 'PLAYING');
+
+    alexaTest.test([
+      {
+        request,
+        saysLike: '1番目のエピソード',
+        shouldEndSession: true,
+        playsStream: {
+          behavior: 'REPLACE_ALL',
+          token: 'backspace.fm:0',
+          url: 'https://tracking.feedpress.it/link/6091/9900270/backspace-d032.mp3',
+          offset: 0
+        }
+      }
+    ]);
+  });
+
+  context('最初のエピソード', () => {
+    const request = alexaTest.getIntentRequest('AMAZON.PreviousIntent');
+    alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:0', 60000, 'PLAYING');
+
+    alexaTest.test([
+      {
+        request,
+        saysLike: '前のエピソードはありません',
+        repromptsNothing: true,
+        shouldEndSession: true,
+        playsStoped: true,
+      }
+    ]);
+  });
+});
+
+describe('対応していない操作', () => {
+  const intents = [
+    'AMAZON.LoopOnIntent',
+    'AMAZON.LoopOffIntent',
+    'AMAZON.RepeatIntent',
+    'AMAZON.ShuffleOnIntent',
+    'AMAZON.ShuffleOffIntent',
+  ];
+
+  intents.forEach((intent) => {
+    context(intent, () => {
+      alexaTest.test([
+        {
+          request: alexaTest.getIntentRequest(intent),
+          saysLike: 'その操作には対応していません',
+          repromptsNothing: true,
+          shouldEndSession: true,
+        }
+      ]);
     });
   });
 });
