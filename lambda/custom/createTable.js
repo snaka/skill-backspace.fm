@@ -2,7 +2,7 @@ const constants = require('./constants.js');
 const AWS = require ('aws-sdk');
 
 AWS.config.update({
-  region: 'us-east-1'
+  region: process.env.AWS_REGION || 'us-east-1'
 });
 
 const db = new AWS.DynamoDB();

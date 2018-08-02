@@ -4,7 +4,7 @@ const AWS = require('aws-sdk');
 const constants = require('./constants');
 
 AWS.config.update({
-  region: process.env.AWS_DEFAULT_REGION || 'us-east-1'
+  region: process.env.AWS_REGION || 'us-east-1'
 });
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
