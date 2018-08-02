@@ -1,4 +1,16 @@
+const nock = require('nock');
 const alexaTest = require('alexa-skill-test-framework');
+
+nock('http://feeds.backspace.fm')
+  .head('/backspacefm')
+  .reply(200, '', {
+    'ETag': '__etag__'
+  });
+
+nock('http://feeds.backspace.fm')
+  .get('/backspacefm')
+  .replyWithFile(200, __dirname + '/replies/backspace.fm.xml', { 'Content-Type': 'text/xml; charset=UTF-8' });
+
 
 alexaTest.initialize(
   require('../index.js'),
