@@ -14,5 +14,9 @@
     "aws-sdk": "^2.283.1",
     "node-feedparser": "^1.0.1",
     "request": "^2.87.0"
+  },
+  "devDependencies": {
+    "alexa-skill-test-framework": "^1.2.2",
+    "mocha": "^5.2.0"
   }
 }

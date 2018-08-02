@@ -32,6 +32,13 @@
         "endpoint": {
           "sourceDir": "lambda/custom"
         },
+        "regions": {
+          "FE": {
+            "endpoint": {
+              "uri": "arn:aws:lambda:ap-northeast-1:105394972992:function:skill-backspace-fm-dev-main"
+            }
+          }
+        },
         "interfaces": [
           { "type": "AUDIO_PLAYER" }
         ]

@@ -8,7 +8,7 @@
           "apis": {
             "custom": {
               "endpoint": {
-                "uri": "ask-custom-backspace-fm-default"
+                "uri": "skill-backspace-fm-dev-main"
               }
             }
           }
@@ -16,7 +16,7 @@
       },
       "resources": {
         "manifest": {
-          "eTag": "82c23d538b0df719f28b05ceccdbdd9d"
+          "eTag": "13bd6535e307d7bd2e393deae8d1cc4c"
         },
         "interactionModel": {
           "ja-JP": {
@@ -25,8 +25,8 @@
         },
         "lambda": [
           {
-            "arn": "arn:aws:lambda:us-east-1:105394972992:function:ask-custom-backspace-fm-default",
-            "functionName": "ask-custom-backspace-fm-default",
+            "arn": "arn:aws:lambda:us-east-1:105394972992:function:skill-backspace-fm-dev-main",
+            "functionName": "skill-backspace-fm-dev-main",
             "awsRegion": "us-east-1",
             "alexaUsage": [
               "custom/default"
