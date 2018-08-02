@@ -2,6 +2,7 @@ service: skill-backspace-fm
 
 provider:
   name: aws
+  region: ap-northeast-1
   runtime: nodejs8.10
   memorySize: 128
   timeout: 30
