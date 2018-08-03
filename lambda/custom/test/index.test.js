@@ -1,13 +1,13 @@
-const nock = require('nock');
-const alexaTest = require('alexa-skill-test-framework');
+const nock = require('nock')
+const alexaTest = require('alexa-skill-test-framework')
 
 alexaTest.initialize(
   require('../index.js'),
   'amzn1.ask.skill.00000000-0000-0000-0000-000000000000',
   'amzn1.ask.account.LONG_STRING',
   'amzn1.ask.device.LONG_STRING'
-);
-alexaTest.setLocale('ja-JP');
+)
+alexaTest.setLocale('ja-JP')
 
 beforeEach(() => {
   // RSSフィードの読み込みをMockに差し替える
@@ -15,16 +15,16 @@ beforeEach(() => {
     .head('/backspacefm')
     .reply(200, '', {
       'ETag': '__etag__'
-    });
+    })
 
   nock('http://feeds.backspace.fm')
     .get('/backspacefm')
-    .replyWithFile(200, __dirname + '/replies/backspace.fm.xml', { 'Content-Type': 'text/xml; charset=UTF-8' });
-});
+    .replyWithFile(200, __dirname + '/replies/backspace.fm.xml', { 'Content-Type': 'text/xml; charset=UTF-8' })
+})
 
-alexaTest.setDynamoDBTable('skill-backspace.fm');
+alexaTest.setDynamoDBTable('skill-backspace.fm')
 
-describe("スキル起動時", () => {
+describe('スキル起動時', () => {
   alexaTest.test([
     {
       request: alexaTest.getLaunchRequest(),
@@ -38,8 +38,8 @@ describe("スキル起動時", () => {
         offset: 0
       }
     }
-  ]);
-});
+  ])
+})
 
 describe('最新エピソードの再生を指示', () => {
   alexaTest.test([
@@ -55,8 +55,8 @@ describe('最新エピソードの再生を指示', () => {
         offset: 0
       }
     }
-  ]);
-});
+  ])
+})
 
 describe('番号指定でエピソードを再生', () => {
   context('上限以内の場合', () => {
@@ -73,8 +73,8 @@ describe('番号指定でエピソードを再生', () => {
           offset: 0
         }
       }
-    ]);
-  });
+    ])
+  })
 
   context('0番目が指定された場合', () => {
     alexaTest.test([
@@ -83,10 +83,10 @@ describe('番号指定でエピソードを再生', () => {
         saysLike: '最近の100エピソードまでしか対応していません',
         repromptsLike: '何番目のエピソードが聴きたいですか？',
         repromptsNothing: false,
-        shouldEndSession: false,
+        shouldEndSession: false
       }
-    ]);
-  });
+    ])
+  })
 
   context('101番目が指定された場合', () => {
     alexaTest.test([
@@ -95,15 +95,15 @@ describe('番号指定でエピソードを再生', () => {
         saysLike: '最近の100エピソードまでしか対応していません',
         repromptsLike: '何番目のエピソードが聴きたいですか？',
         repromptsNothing: false,
-        shouldEndSession: false,
+        shouldEndSession: false
       }
-    ]);
-  });
-});
+    ])
+  })
+})
 
 describe('先頭からを指示', () => {
-  const request = alexaTest.getIntentRequest('AMAZON.StartOverIntent');
-  alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:2', 1000);
+  const request = alexaTest.getIntentRequest('AMAZON.StartOverIntent')
+  alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:2', 1000)
 
   alexaTest.test([
     {
@@ -117,12 +117,12 @@ describe('先頭からを指示', () => {
         offset: 0
       }
     }
-  ]);
-});
+  ])
+})
 
 describe('早送り', () => {
-  const request = alexaTest.getIntentRequest('FastforwardIntent', { 'skipMinutes': 5 });
-  alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:0', 60000);
+  const request = alexaTest.getIntentRequest('FastforwardIntent', { 'skipMinutes': 5 })
+  alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:0', 60000)
 
   alexaTest.test([
     {
@@ -136,12 +136,12 @@ describe('早送り', () => {
         offset: 360000
       }
     }
-  ]);
-});
+  ])
+})
 
 describe('巻き戻し', () => {
-  const request = alexaTest.getIntentRequest('RewindIntent', { 'skipMinutes': 5 });
-  alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:0', 360000);
+  const request = alexaTest.getIntentRequest('RewindIntent', { 'skipMinutes': 5 })
+  alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:0', 360000)
 
   alexaTest.test([
     {
@@ -155,8 +155,8 @@ describe('巻き戻し', () => {
         offset: 60000
       }
     }
-  ]);
-});
+  ])
+})
 
 describe('ヘルプ', () => {
   alexaTest.test([
@@ -165,23 +165,23 @@ describe('ヘルプ', () => {
       saysLike: 'バックスペースエフエムで配信中の最新から100番目のエピソードを聴くことができます',
       repromptsLike: '何番目のエピソードが聴きたいですか？',
       shouldEndSession: false,
-      hasCardTitle: 'backspace.fm プレイヤーについて',
+      hasCardTitle: 'backspace.fm プレイヤーについて'
     }
-  ]);
-});
+  ])
+})
 
 describe('キャンセル', () => {
   const intents = [
     'AMAZON.CancelIntent',
     'AMAZON.StopIntent',
-    'AMAZON.PauseIntent',
-  ];
+    'AMAZON.PauseIntent'
+  ]
 
   intents.forEach((intent) => {
     context(`インテントが ${intent}`, () => {
       context('再生中', () => {
-        const request = alexaTest.getIntentRequest(intent);
-        alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:0', 60000, 'PLAYING');
+        const request = alexaTest.getIntentRequest(intent)
+        alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:0', 60000, 'PLAYING')
 
         alexaTest.test([
           {
@@ -189,14 +189,14 @@ describe('キャンセル', () => {
             saysNothing: true,
             repromptsNothing: true,
             shouldEndSession: true,
-            stopStream: true,
+            stopStream: true
           }
-        ]);
-      });
+        ])
+      })
 
       context('停止中', () => {
-        const request = alexaTest.getIntentRequest(intent);
-        alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:0', 60000, 'PAUSED');
+        const request = alexaTest.getIntentRequest(intent)
+        alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:0', 60000, 'PAUSED')
 
         alexaTest.test([
           {
@@ -204,17 +204,17 @@ describe('キャンセル', () => {
             saysLike: '停止します',
             repromptsNothing: true,
             shouldEndSession: true,
-            stopStream: true,
+            stopStream: true
           }
-        ]);
-      });
-    });
-  });
-});
+        ])
+      })
+    })
+  })
+})
 
 describe('レジューム', () => {
-  const request = alexaTest.getIntentRequest('AMAZON.ResumeIntent');
-  alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:0', 60000, 'PAUSED');
+  const request = alexaTest.getIntentRequest('AMAZON.ResumeIntent')
+  alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:0', 60000, 'PAUSED')
 
   alexaTest.test([
     {
@@ -228,13 +228,13 @@ describe('レジューム', () => {
         offset: 60000
       }
     }
-  ]);
-});
+  ])
+})
 
 describe('次へ', () => {
   context('最後のエピソードではない', () => {
-    const request = alexaTest.getIntentRequest('AMAZON.NextIntent');
-    alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:0', 60000, 'PLAYING');
+    const request = alexaTest.getIntentRequest('AMAZON.NextIntent')
+    alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:0', 60000, 'PLAYING')
 
     alexaTest.test([
       {
@@ -248,28 +248,28 @@ describe('次へ', () => {
           offset: 0
         }
       }
-    ]);
-  });
+    ])
+  })
 
   context('最後のエピソード', () => {
-    const request = alexaTest.getIntentRequest('AMAZON.NextIntent');
-    alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:99', 60000, 'PLAYING');
+    const request = alexaTest.getIntentRequest('AMAZON.NextIntent')
+    alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:99', 60000, 'PLAYING')
 
     alexaTest.test([
       {
         request,
         saysLike: '次のエピソードはありません',
         shouldEndSession: true,
-        playsStoped: true,
+        playsStoped: true
       }
-    ]);
-  });
-});
+    ])
+  })
+})
 
 describe('前へ', () => {
   context('最初のエピソードではない', () => {
-    const request = alexaTest.getIntentRequest('AMAZON.PreviousIntent');
-    alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:1', 60000, 'PLAYING');
+    const request = alexaTest.getIntentRequest('AMAZON.PreviousIntent')
+    alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:1', 60000, 'PLAYING')
 
     alexaTest.test([
       {
@@ -283,12 +283,12 @@ describe('前へ', () => {
           offset: 0
         }
       }
-    ]);
-  });
+    ])
+  })
 
   context('最初のエピソード', () => {
-    const request = alexaTest.getIntentRequest('AMAZON.PreviousIntent');
-    alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:0', 60000, 'PLAYING');
+    const request = alexaTest.getIntentRequest('AMAZON.PreviousIntent')
+    alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:0', 60000, 'PLAYING')
 
     alexaTest.test([
       {
@@ -296,11 +296,11 @@ describe('前へ', () => {
         saysLike: '前のエピソードはありません',
         repromptsNothing: true,
         shouldEndSession: true,
-        playsStoped: true,
+        playsStoped: true
       }
-    ]);
-  });
-});
+    ])
+  })
+})
 
 describe('対応していない操作', () => {
   const intents = [
@@ -308,8 +308,8 @@ describe('対応していない操作', () => {
     'AMAZON.LoopOffIntent',
     'AMAZON.RepeatIntent',
     'AMAZON.ShuffleOnIntent',
-    'AMAZON.ShuffleOffIntent',
-  ];
+    'AMAZON.ShuffleOffIntent'
+  ]
 
   intents.forEach((intent) => {
     context(intent, () => {
@@ -318,22 +318,22 @@ describe('対応していない操作', () => {
           request: alexaTest.getIntentRequest(intent),
           saysLike: 'その操作には対応していません',
           repromptsNothing: true,
-          shouldEndSession: true,
+          shouldEndSession: true
         }
-      ]);
-    });
-  });
-});
+      ])
+    })
+  })
+})
 
 describe('AudioPlayerEvent', () => {
-  it('PlaybackStarted');
-  it('PlaybackNealyFinished');
-});
+  it('PlaybackStarted')
+  it('PlaybackNealyFinished')
+})
 
 describe('セッション終了', () => {
-  it('session ended');
-});
+  it('session ended')
+})
 
 describe('エラー', () => {
-  it('error');
-});
+  it('error')
+})

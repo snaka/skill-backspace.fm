@@ -1,4 +1,4 @@
-exports.getResolvedValueName = function(envelope, slotName) {
+exports.getResolvedValueName = function (envelope, slotName) {
   if (
     envelope &&
     envelope.request &&
@@ -11,17 +11,14 @@ exports.getResolvedValueName = function(envelope, slotName) {
     envelope.request.intent.slots[slotName].resolutions.resolutionsPerAuthority[0].values &&
     envelope.request.intent.slots[slotName].resolutions.resolutionsPerAuthority[0].values[0] &&
     envelope.request.intent.slots[slotName].resolutions.resolutionsPerAuthority[0].values[0].value &&
-    envelope.request.intent.slots[slotName].resolutions.resolutionsPerAuthority[0].values[0].value.name)
-  {
-    return envelope.request.intent.slots[slotName].resolutions.resolutionsPerAuthority[0].values[0].value.name;
+    envelope.request.intent.slots[slotName].resolutions.resolutionsPerAuthority[0].values[0].value.name) {
+    return envelope.request.intent.slots[slotName].resolutions.resolutionsPerAuthority[0].values[0].value.name
+  } else {
+    return undefined
   }
-  else
-  {
-    return undefined;
-  }
-};
+}
 
-exports.getResolvedValueId = function(envelope, slotName) {
+exports.getResolvedValueId = function (envelope, slotName) {
   if (
     envelope &&
     envelope.request &&
@@ -34,42 +31,33 @@ exports.getResolvedValueId = function(envelope, slotName) {
     envelope.request.intent.slots[slotName].resolutions.resolutionsPerAuthority[0].values &&
     envelope.request.intent.slots[slotName].resolutions.resolutionsPerAuthority[0].values[0] &&
     envelope.request.intent.slots[slotName].resolutions.resolutionsPerAuthority[0].values[0].value &&
-    envelope.request.intent.slots[slotName].resolutions.resolutionsPerAuthority[0].values[0].value.id)
-  {
-    return envelope.request.intent.slots[slotName].resolutions.resolutionsPerAuthority[0].values[0].value.id;
+    envelope.request.intent.slots[slotName].resolutions.resolutionsPerAuthority[0].values[0].value.id) {
+    return envelope.request.intent.slots[slotName].resolutions.resolutionsPerAuthority[0].values[0].value.id
+  } else {
+    return undefined
   }
-  else
-  {
-    return undefined;
-  }
-};
+}
 
-exports.getSlotValueAsInt = function(envelope, slotName) {
+exports.getSlotValueAsInt = function (envelope, slotName) {
   if (
     envelope &&
     envelope.request &&
     envelope.request.intent &&
     envelope.request.intent.slots &&
     envelope.request.intent.slots[slotName] &&
-    envelope.request.intent.slots[slotName].value)
-  {
-    return parseInt(envelope.request.intent.slots[slotName].value);
+    envelope.request.intent.slots[slotName].value) {
+    return parseInt(envelope.request.intent.slots[slotName].value)
+  } else {
+    return 0
   }
-  else
-  {
-    return 0;
-  }
-};
+}
 
-exports.getPlayingIndex = function(context) {
+exports.getPlayingIndex = function (context) {
   if (context &&
     context.AudioPlayer &&
-    context.AudioPlayer.token)
-  {
-    return parseInt(context.AudioPlayer.token);
-  }
-  else
-  {
-    return undefined;
+    context.AudioPlayer.token) {
+    return parseInt(context.AudioPlayer.token)
+  } else {
+    return undefined
   }
 }

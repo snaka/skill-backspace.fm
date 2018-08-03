@@ -1,392 +1,392 @@
 /* eslint-disable  func-names */
 /* eslint-disable  no-console */
 
-const Alexa = require('ask-sdk-core');
-const constants = require('./constants');
-const util = require('./alexa-utility');
-const podcast = require('./podcast');
+const Alexa = require('ask-sdk-core')
+const constants = require('./constants')
+const util = require('./alexa-utility')
+const podcast = require('./podcast')
 
 const PlayPodcastIntentHandler = {
-  canHandle(handlerInput) {
-    return handlerInput.requestEnvelope.request.type === 'LaunchRequest'
-      || (handlerInput.requestEnvelope.request.type === 'IntentRequest'
-        && handlerInput.requestEnvelope.request.intent.name === 'PlayPodcastIntent');
+  canHandle (handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'LaunchRequest' ||
+      (handlerInput.requestEnvelope.request.type === 'IntentRequest' &&
+        handlerInput.requestEnvelope.request.intent.name === 'PlayPodcastIntent')
   },
-  async handle(handlerInput) {
-    console.log('PLAY PODCAST');
+  async handle (handlerInput) {
+    console.log('PLAY PODCAST')
 
-    const token = createToken(constants.PODCAST_ID, 0);
-    const episode = await podcast.getEpisodeInfo(constants.PODCAST_ID, 0);
-    console.log('episode: ', episode);
-    const speechText = `${constants.PODCAST_NAME_LOCALIZED} の最新エピソード「${episode.title}」を再生します`;
-    const cardText = `${constants.PODCAST_NAME} の最新エピソード「${episode.title}」を再生します`;
+    const token = createToken(constants.PODCAST_ID, 0)
+    const episode = await podcast.getEpisodeInfo(constants.PODCAST_ID, 0)
+    console.log('episode: ', episode)
+    const speechText = `${constants.PODCAST_NAME_LOCALIZED} の最新エピソード「${episode.title}」を再生します`
+    const cardText = `${constants.PODCAST_NAME} の最新エピソード「${episode.title}」を再生します`
 
     return handlerInput.responseBuilder
       .speak(speechText)
       .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, token, 0)
       .withSimpleCard(`${constants.PODCAST_NAME} の最新エピソード`, speechText)
-      .getResponse();
+      .getResponse()
   }
-};
+}
 
 const PlayPodcastByIndexIntentHandler = {
-  canHandle(handlerInput) {
-    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-      && handlerInput.requestEnvelope.request.intent.name === 'PlayPodcastByIndexIntent';
+  canHandle (handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest' &&
+      handlerInput.requestEnvelope.request.intent.name === 'PlayPodcastByIndexIntent'
   },
-  async handle(handlerInput) {
-    console.log('PLAY PODCAST WITH EPISODE NO.');
+  async handle (handlerInput) {
+    console.log('PLAY PODCAST WITH EPISODE NO.')
 
-    const index = util.getSlotValueAsInt(handlerInput.requestEnvelope, 'indexOfEpisodes');
+    const index = util.getSlotValueAsInt(handlerInput.requestEnvelope, 'indexOfEpisodes')
     if (index < 1 || index > constants.MAX_EPISODE_COUNT) {
-      console.log('INVALID INDEX:', index);
-      const speechText = `ごめんなさい、最近の${constants.MAX_EPISODE_COUNT}エピソードまでしか対応していません。何番目のエピソードが聴きたいですか？`;
-      const repromptText = '何番目のエピソードが聴きたいですか？';
+      console.log('INVALID INDEX:', index)
+      const speechText = `ごめんなさい、最近の${constants.MAX_EPISODE_COUNT}エピソードまでしか対応していません。何番目のエピソードが聴きたいですか？`
+      const repromptText = '何番目のエピソードが聴きたいですか？'
       return handlerInput.responseBuilder
         .speak(speechText)
         .reprompt(repromptText)
         .withSimpleCard('対応していないエピソード', speechText)
-        .getResponse();
+        .getResponse()
     }
-    const episode = await podcast.getEpisodeInfo(constants.PODCAST_ID, index - 1);
-    const token = createToken(constants.PODCAST_ID, index - 1);
-    const speechText = `${constants.PODCAST_NAME_LOCALIZED} の ${index} 番目のエピソード「${episode.title}」を再生します`;
-    const cardText = `${constants.PODCAST_NAME} の ${index} 番目のエピソード「${episode.title}」を再生します`;
+    const episode = await podcast.getEpisodeInfo(constants.PODCAST_ID, index - 1)
+    const token = createToken(constants.PODCAST_ID, index - 1)
+    const speechText = `${constants.PODCAST_NAME_LOCALIZED} の ${index} 番目のエピソード「${episode.title}」を再生します`
+    const cardText = `${constants.PODCAST_NAME} の ${index} 番目のエピソード「${episode.title}」を再生します`
 
     return handlerInput.responseBuilder
       .speak(speechText)
       .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, token, 0)
       .withSimpleCard(`${constants.PODCAST_NAME} の ${index} 番目のエピソード`, cardText)
-      .getResponse();
+      .getResponse()
   }
-};
+}
 
 const StartOverIntentHandler = {
- canHandle(handlerInput) {
-    const request = handlerInput.requestEnvelope.request;
+  canHandle (handlerInput) {
+    const request = handlerInput.requestEnvelope.request
 
-    return request.type === 'IntentRequest'
-      && request.intent.name === 'AMAZON.StartOverIntent';
+    return request.type === 'IntentRequest' &&
+      request.intent.name === 'AMAZON.StartOverIntent'
   },
-  async handle(handlerInput) {
-    const token = handlerInput.requestEnvelope.context.AudioPlayer.token;
-    const { _id, index } = parseToken(token);
-    const episode = await podcast.getEpisodeInfo(constants.PODCAST_ID, index);
+  async handle (handlerInput) {
+    const token = handlerInput.requestEnvelope.context.AudioPlayer.token
+    const { _id, index } = parseToken(token)
+    const episode = await podcast.getEpisodeInfo(constants.PODCAST_ID, index)
 
-    console.log(`START OVER: token ${token}`);
+    console.log(`START OVER: token ${token}`)
 
     return handlerInput.responseBuilder
       .speak(`先頭から再生します`)
       .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, token, 0)
-      .getResponse();
+      .getResponse()
   }
-};
+}
 
 const FastforwardIntentHandler = {
-  canHandle(handlerInput) {
-    const request = handlerInput.requestEnvelope.request;
+  canHandle (handlerInput) {
+    const request = handlerInput.requestEnvelope.request
 
-    return request.type === 'IntentRequest'
-      && request.intent.name === 'FastforwardIntent';
+    return request.type === 'IntentRequest' &&
+      request.intent.name === 'FastforwardIntent'
   },
-  async handle(handlerInput) {
-    const token = handlerInput.requestEnvelope.context.AudioPlayer.token;
-    const offset = handlerInput.requestEnvelope.context.AudioPlayer.offsetInMilliseconds;
-    const { _id, index } = parseToken(token);
-    const episode = await podcast.getEpisodeInfo(constants.PODCAST_ID, index);
-    const skipMinutes = util.getSlotValueAsInt(handlerInput.requestEnvelope, 'skipMinutes');
-    let newOffset = offset + skipMinutes * 60000;
+  async handle (handlerInput) {
+    const token = handlerInput.requestEnvelope.context.AudioPlayer.token
+    const offset = handlerInput.requestEnvelope.context.AudioPlayer.offsetInMilliseconds
+    const { _id, index } = parseToken(token)
+    const episode = await podcast.getEpisodeInfo(constants.PODCAST_ID, index)
+    const skipMinutes = util.getSlotValueAsInt(handlerInput.requestEnvelope, 'skipMinutes')
+    let newOffset = offset + skipMinutes * 60000
 
-    console.log(`FASTFORWARD: token ${token} offset ${offset} skipMinutes ${skipMinutes}`);
+    console.log(`FASTFORWARD: token ${token} offset ${offset} skipMinutes ${skipMinutes}`)
 
     return handlerInput.responseBuilder
       .speak(`${skipMinutes}分進めます`)
       .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, token, newOffset)
-      .getResponse();
+      .getResponse()
   }
-};
+}
 
 const RewindIntentHandler = {
-  canHandle(handlerInput) {
-    const request = handlerInput.requestEnvelope.request;
+  canHandle (handlerInput) {
+    const request = handlerInput.requestEnvelope.request
 
-    return request.type === 'IntentRequest'
-      && request.intent.name === 'RewindIntent';
+    return request.type === 'IntentRequest' &&
+      request.intent.name === 'RewindIntent'
   },
-  async handle(handlerInput) {
-    const token = handlerInput.requestEnvelope.context.AudioPlayer.token;
-    const offset = handlerInput.requestEnvelope.context.AudioPlayer.offsetInMilliseconds;
-    const { _id, index } = parseToken(token);
-    const episode = await podcast.getEpisodeInfo(constants.PODCAST_ID, index);
-    const skipMinutes = util.getSlotValueAsInt(handlerInput.requestEnvelope, 'skipMinutes');
-    let newOffset = offset - skipMinutes * 60000;
-    if (newOffset < 0) newOffset = 0;
+  async handle (handlerInput) {
+    const token = handlerInput.requestEnvelope.context.AudioPlayer.token
+    const offset = handlerInput.requestEnvelope.context.AudioPlayer.offsetInMilliseconds
+    const { _id, index } = parseToken(token)
+    const episode = await podcast.getEpisodeInfo(constants.PODCAST_ID, index)
+    const skipMinutes = util.getSlotValueAsInt(handlerInput.requestEnvelope, 'skipMinutes')
+    let newOffset = offset - skipMinutes * 60000
+    if (newOffset < 0) newOffset = 0
 
-    console.log(`FASTFORWARD: token ${token} offset ${offset} skipMinutes ${skipMinutes}`);
+    console.log(`FASTFORWARD: token ${token} offset ${offset} skipMinutes ${skipMinutes}`)
 
     return handlerInput.responseBuilder
       .speak(`${skipMinutes}分戻ります`)
       .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, token, newOffset)
-      .getResponse();
+      .getResponse()
   }
-};
+}
 
 const HelpIntentHandler = {
-  canHandle(handlerInput) {
-    const request = handlerInput.requestEnvelope.request;
+  canHandle (handlerInput) {
+    const request = handlerInput.requestEnvelope.request
 
-    return request.type === 'IntentRequest'
-      && request.intent.name === 'AMAZON.HelpIntent';
+    return request.type === 'IntentRequest' &&
+      request.intent.name === 'AMAZON.HelpIntent'
   },
-  handle(handlerInput) {
-    console.log('HELP');
-    const speechText = `バックスペースエフエムプレイヤーではバックスペースエフエムで配信中の最新から${constants.MAX_EPISODE_COUNT}番目のエピソードを聴くことができます。何番目のエピソードが聴きたいですか？`;
-    const repromptText = '何番目のエピソードが聴きたいですか？';
+  handle (handlerInput) {
+    console.log('HELP')
+    const speechText = `バックスペースエフエムプレイヤーではバックスペースエフエムで配信中の最新から${constants.MAX_EPISODE_COUNT}番目のエピソードを聴くことができます。何番目のエピソードが聴きたいですか？`
+    const repromptText = '何番目のエピソードが聴きたいですか？'
 
     return handlerInput.responseBuilder
       .speak(speechText)
       .reprompt(repromptText)
       .withSimpleCard('backspace.fm プレイヤーについて', speechText)
-      .getResponse();
-  },
-};
+      .getResponse()
+  }
+}
 
 const CancelAndStopIntentHandler = {
-  canHandle(handlerInput) {
-    const request = handlerInput.requestEnvelope.request;
-    return request.type === 'IntentRequest'
-      && (request.intent.name === 'AMAZON.CancelIntent'
-        || request.intent.name === 'AMAZON.StopIntent'
-        || request.intent.name === 'AMAZON.PauseIntent');
+  canHandle (handlerInput) {
+    const request = handlerInput.requestEnvelope.request
+    return request.type === 'IntentRequest' &&
+      (request.intent.name === 'AMAZON.CancelIntent' ||
+        request.intent.name === 'AMAZON.StopIntent' ||
+        request.intent.name === 'AMAZON.PauseIntent')
   },
-  handle(handlerInput) {
-    console.log(handlerInput.requestEnvelope.context.AudioPlayer);
+  handle (handlerInput) {
+    console.log(handlerInput.requestEnvelope.context.AudioPlayer)
 
-    const playerActivity = handlerInput.requestEnvelope.context.AudioPlayer.playerActivity;
-    const token = handlerInput.requestEnvelope.context.AudioPlayer.token;
-    const offset = handlerInput.requestEnvelope.context.AudioPlayer.offsetInMilliseconds;
+    const playerActivity = handlerInput.requestEnvelope.context.AudioPlayer.playerActivity
+    const token = handlerInput.requestEnvelope.context.AudioPlayer.token
+    const offset = handlerInput.requestEnvelope.context.AudioPlayer.offsetInMilliseconds
 
-    const request = handlerInput.requestEnvelope.request;
-    let speechText;
+    const request = handlerInput.requestEnvelope.request
+    let speechText
     if (playerActivity === 'PLAYING') {
       return handlerInput.responseBuilder
         .addAudioPlayerStopDirective()
-        .getResponse();
+        .getResponse()
     }
 
-    switch(request.intent.name) {
+    switch (request.intent.name) {
       case 'AMAZON.CancelIntent':
       case 'AMAZON.StopIntent':
       case 'AMAZON.PauseIntent':
-        speechText = '停止します';
-        break;
+        speechText = '停止します'
+        break
     }
 
-    console.log(`STOP: token ${token} offset ${offset} intent ${request.intent.name}`);
+    console.log(`STOP: token ${token} offset ${offset} intent ${request.intent.name}`)
 
     return handlerInput.responseBuilder
       .speak(speechText)
       .addAudioPlayerStopDirective()
-      .getResponse();
+      .getResponse()
   }
-};
+}
 
 const ResumeIntentHandler = {
-  canHandle(handlerInput) {
-    const request = handlerInput.requestEnvelope.request;
-    return request.type === 'IntentRequest'
-      && request.intent.name === 'AMAZON.ResumeIntent';
+  canHandle (handlerInput) {
+    const request = handlerInput.requestEnvelope.request
+    return request.type === 'IntentRequest' &&
+      request.intent.name === 'AMAZON.ResumeIntent'
   },
-  async handle(handlerInput) {
-    console.log(handlerInput.requestEnvelope.context.AudioPlayer);
+  async handle (handlerInput) {
+    console.log(handlerInput.requestEnvelope.context.AudioPlayer)
 
-    const token = handlerInput.requestEnvelope.context.AudioPlayer.token;
-    const offset = handlerInput.requestEnvelope.context.AudioPlayer.offsetInMilliseconds;
-    const { _id, index } = parseToken(token);
-    const episode = await podcast.getEpisodeInfo(constants.PODCAST_ID, index);
+    const token = handlerInput.requestEnvelope.context.AudioPlayer.token
+    const offset = handlerInput.requestEnvelope.context.AudioPlayer.offsetInMilliseconds
+    const { _id, index } = parseToken(token)
+    const episode = await podcast.getEpisodeInfo(constants.PODCAST_ID, index)
 
     return handlerInput.responseBuilder
       .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, token, offset)
-      .getResponse();
+      .getResponse()
   }
-};
+}
 
 const NextIntentHandler = {
-  canHandle(handlerInput) {
-    const request = handlerInput.requestEnvelope.request;
+  canHandle (handlerInput) {
+    const request = handlerInput.requestEnvelope.request
 
-    return request.type === 'IntentRequest'
-      && request.intent.name === 'AMAZON.NextIntent';
+    return request.type === 'IntentRequest' &&
+      request.intent.name === 'AMAZON.NextIntent'
   },
-  async handle(handlerInput) {
-    const token = handlerInput.requestEnvelope.context.AudioPlayer.token;
-    const { _id, index } = parseToken(token);
+  async handle (handlerInput) {
+    const token = handlerInput.requestEnvelope.context.AudioPlayer.token
+    const { _id, index } = parseToken(token)
 
-    const nextIndex = index + 1;
+    const nextIndex = index + 1
     if (nextIndex >= constants.MAX_EPISODE_COUNT) {
       return handlerInput.responseBuilder
         .speak('次のエピソードはありません')
-        .getResponse();
+        .getResponse()
     }
 
-    const podcastName = util.getResolvedValueName(handlerInput.requestEnvelope, 'podcastName');
-    const nextToken = createToken(constants.PODCAST_ID, nextIndex);
+    const podcastName = util.getResolvedValueName(handlerInput.requestEnvelope, 'podcastName')
+    const nextToken = createToken(constants.PODCAST_ID, nextIndex)
     const episode = await podcast.getEpisodeInfo(constants.PODCAST_ID, nextIndex)
-    console.log('NEXT ', nextToken, episode);
+    console.log('NEXT ', nextToken, episode)
 
-    const speechText = `${nextIndex + 1}番目のエピソード「${episode.title}」を再生します`;
+    const speechText = `${nextIndex + 1}番目のエピソード「${episode.title}」を再生します`
 
     return handlerInput.responseBuilder
       .speak(speechText)
       .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, nextToken, 0)
       .withSimpleCard(`${constants.PODCAST_NAME} の ${nextIndex + 1} 番目のエピソード`, speechText)
-      .getResponse();
+      .getResponse()
   }
 }
 
 const PreviousIntentHandler = {
-  canHandle(handlerInput) {
-    const request = handlerInput.requestEnvelope.request;
+  canHandle (handlerInput) {
+    const request = handlerInput.requestEnvelope.request
 
-    return request.type === 'IntentRequest'
-      && request.intent.name === 'AMAZON.PreviousIntent';
+    return request.type === 'IntentRequest' &&
+      request.intent.name === 'AMAZON.PreviousIntent'
   },
-  async handle(handlerInput) {
-    const token = handlerInput.requestEnvelope.context.AudioPlayer.token;
-    const { _id, index } = parseToken(token);
+  async handle (handlerInput) {
+    const token = handlerInput.requestEnvelope.context.AudioPlayer.token
+    const { _id, index } = parseToken(token)
 
-    const nextIndex = index - 1;
+    const nextIndex = index - 1
     if (nextIndex < 0) {
       return handlerInput.responseBuilder
         .speak('前のエピソードはありません')
-        .getResponse();
+        .getResponse()
     }
 
-    const podcastName = util.getResolvedValueName(handlerInput.requestEnvelope, 'podcastName');
-    const nextToken = createToken(constants.PODCAST_ID, nextIndex);
+    const podcastName = util.getResolvedValueName(handlerInput.requestEnvelope, 'podcastName')
+    const nextToken = createToken(constants.PODCAST_ID, nextIndex)
     const episode = await podcast.getEpisodeInfo(constants.PODCAST_ID, nextIndex)
-    console.log('PREV ', nextToken, constants.PODCAST_ID, nextIndex, episode);
+    console.log('PREV ', nextToken, constants.PODCAST_ID, nextIndex, episode)
 
-    const speechText = `${nextIndex + 1}番目のエピソード「${episode.title}」を再生します`;
+    const speechText = `${nextIndex + 1}番目のエピソード「${episode.title}」を再生します`
 
     return handlerInput.responseBuilder
       .speak(speechText)
       .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, nextToken, 0)
       .withSimpleCard(`${constants.PODCAST_NAME} の ${nextIndex + 1} 番目のエピソード`, speechText)
-      .getResponse();
+      .getResponse()
   }
 }
 
 const UnsupportedIntentHandler = {
-  canHandle(handlerInput) {
-    const request = handlerInput.requestEnvelope.request;
+  canHandle (handlerInput) {
+    const request = handlerInput.requestEnvelope.request
 
     return request.type === 'IntentRequest' && (
       request.intent.name === 'AMAZON.LoopOnIntent' ||
       request.intent.name === 'AMAZON.LoopOffIntent' ||
       request.intent.name === 'AMAZON.RepeatIntent' ||
       request.intent.name === 'AMAZON.ShuffleOnIntent' ||
-      request.intent.name === 'AMAZON.ShuffleOffIntent');
+      request.intent.name === 'AMAZON.ShuffleOffIntent')
   },
-  handle(handlerInput) {
+  handle (handlerInput) {
     return handlerInput.responseBuilder
       .speak('すみません、その操作には対応していません')
-      .getResponse();
+      .getResponse()
   }
 }
 
 const AudioPlayerEventHandler = {
-  canHandle(handlerInput) {
-    return handlerInput.requestEnvelope.request.type.startsWith('AudioPlayer.');
+  canHandle (handlerInput) {
+    return handlerInput.requestEnvelope.request.type.startsWith('AudioPlayer.')
   },
-  handle(handlerInput) {
+  handle (handlerInput) {
     const {
       requestEnvelope,
       responseBuilder
-    } = handlerInput;
-    const audioPlayerEventName = requestEnvelope.request.type.split('.')[1];
+    } = handlerInput
+    const audioPlayerEventName = requestEnvelope.request.type.split('.')[1]
 
-    console.log('handlerInput: ', handlerInput);
+    console.log('handlerInput: ', handlerInput)
 
-    let token = getToken(handlerInput);
+    let token = getToken(handlerInput)
 
     switch (audioPlayerEventName) {
       case 'PlaybackStarted':
-        console.log(`PlaybackStarted: ${token}`);
-        break;
+        console.log(`PlaybackStarted: ${token}`)
+        break
       case 'PlaybackFinished':
-        console.log(`PlaybackFinished: ${token}`);
-        break;
+        console.log(`PlaybackFinished: ${token}`)
+        break
       case 'PlaybackStopped':
-        console.log(`PlaybackStopped: ${token}`);
-        break;
+        console.log(`PlaybackStopped: ${token}`)
+        break
       case 'PlaybackNearlyFinished':
-        console.log(`PlaybackNearlyFinished: ${token}`);
-        break;
+        console.log(`PlaybackNearlyFinished: ${token}`)
+        break
       case 'PlaybackFailed':
-        console.log(`PlaybackFailed: ${token}`);
-        break;
+        console.log(`PlaybackFailed: ${token}`)
+        break
       default:
-        throw new Error(`Not implemented yet : ${audioPlayerEventName}`);
+        throw new Error(`Not implemented yet : ${audioPlayerEventName}`)
     }
 
-    return responseBuilder.getResponse();
+    return responseBuilder.getResponse()
   }
-};
+}
 
 const SessionEndedRequestHandler = {
-  canHandle(handlerInput) {
-    return handlerInput.requestEnvelope.request.type === 'SessionEndedRequest';
+  canHandle (handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'SessionEndedRequest'
   },
-  handle(handlerInput) {
-    console.log(`Session ended with reason: ${handlerInput.requestEnvelope.request.reason}`);
+  handle (handlerInput) {
+    console.log(`Session ended with reason: ${handlerInput.requestEnvelope.request.reason}`)
 
-    return handlerInput.responseBuilder.getResponse();
-  },
-};
+    return handlerInput.responseBuilder.getResponse()
+  }
+}
 
 const SystemExceptionHandler = {
-  canHandle(handlerInput) {
-    return handlerInput.requestEnvelope.request.type == 'System.ExceptionEncountered';
+  canHandle (handlerInput) {
+    return handlerInput.requestEnvelope.request.type == 'System.ExceptionEncountered'
   },
-  handle(handlerInput) {
-    console.error(`System exception encountered: ${handlerInput.requestEnvelope.request.reason}`);
+  handle (handlerInput) {
+    console.error(`System exception encountered: ${handlerInput.requestEnvelope.request.reason}`)
   }
-};
+}
 
 const ErrorHandler = {
-  canHandle() {
-    return true;
+  canHandle () {
+    return true
   },
-  handle(handlerInput, error) {
-    const speechText = 'ごめんなさい、よく理解できませんでした。';
-    console.log(handlerInput.requestEnvelope.request.intent);
-    console.log(`ERROR: ${error.message}`);
+  handle (handlerInput, error) {
+    const speechText = 'ごめんなさい、よく理解できませんでした。'
+    console.log(handlerInput.requestEnvelope.request.intent)
+    console.log(`ERROR: ${error.message}`)
 
     return handlerInput.responseBuilder
       .speak(speechText)
       .reprompt(speechText)
-      .getResponse();
-  },
-};
-
-function getToken(handlerInput) {
-  return handlerInput.requestEnvelope.request.token;
+      .getResponse()
+  }
 }
 
-function createToken(podcastId, episodeIndex) {
-  return `${podcastId}:${episodeIndex}`;
+function getToken (handlerInput) {
+  return handlerInput.requestEnvelope.request.token
 }
 
-function parseToken(token) {
-  const [podcastId, index] = token.split(':');
+function createToken (podcastId, episodeIndex) {
+  return `${podcastId}:${episodeIndex}`
+}
+
+function parseToken (token) {
+  const [podcastId, index] = token.split(':')
   return {
     podcastId: podcastId,
     index: parseInt(index)
-  };
+  }
 }
 
-const skillBuilder = Alexa.SkillBuilders.custom();
+const skillBuilder = Alexa.SkillBuilders.custom()
 
 exports.handler = skillBuilder
   .addRequestHandlers(
@@ -406,4 +406,4 @@ exports.handler = skillBuilder
     SystemExceptionHandler
   )
   .addErrorHandlers(ErrorHandler)
-  .lambda();
+  .lambda()
