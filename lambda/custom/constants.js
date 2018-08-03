@@ -1,3 +1,5 @@
+'use strict'
+
 module.exports = Object.freeze({
   TABLE_NAME: 'skill-backspace.fm',
   PODCAST_ID: 'backspace.fm',

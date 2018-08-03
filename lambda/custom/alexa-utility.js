@@ -1,3 +1,5 @@
+'use strict'
+
 exports.getResolvedValueName = function (envelope, slotName) {
   if (
     envelope &&

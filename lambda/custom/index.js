@@ -1,5 +1,6 @@
 /* eslint-disable  func-names */
 /* eslint-disable  no-console */
+'use strict'
 
 const Alexa = require('ask-sdk-core')
 const constants = require('./constants')
