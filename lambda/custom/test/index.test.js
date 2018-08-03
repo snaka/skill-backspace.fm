@@ -325,3 +325,15 @@ describe('対応していない操作', () => {
   });
 });
 
+describe('AudioPlayerEvent', () => {
+  it('PlaybackStarted');
+  it('PlaybackNealyFinished');
+});
+
+describe('セッション終了', () => {
+  it('session ended');
+});
+
+describe('エラー', () => {
+  it('error');
+});
