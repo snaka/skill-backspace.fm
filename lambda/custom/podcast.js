@@ -112,9 +112,13 @@ exports.getEpisodeInfo = (podcastId, index) => {
 
     request.get(targetPodcast.feedUrl)
       .on('error', (err, res) => {
+        if (err) {
+          console.error(err)
+          return
+        }
         console.error(`Bad status res ${res} from ${targetPodcast.feedUrl}`)
         if (res && res.code) {
-          reject(`Bad status ${res.code} from ${targetPodcast.feedUrl}`)
+          reject(new Error(`Bad status ${res.code} from ${targetPodcast.feedUrl}`))
         }
       }).pipe(feedparser)
 

@@ -1,3 +1,5 @@
+/* eslint-env mocha */
+const path = require('path')
 const nock = require('nock')
 const alexaTest = require('alexa-skill-test-framework')
 
@@ -19,7 +21,7 @@ beforeEach(() => {
 
   nock('http://feeds.backspace.fm')
     .get('/backspacefm')
-    .replyWithFile(200, __dirname + '/replies/backspace.fm.xml', { 'Content-Type': 'text/xml; charset=UTF-8' })
+    .replyWithFile(200, path.join(__dirname, '/replies/backspace.fm.xml'), { 'Content-Type': 'text/xml; charset=UTF-8' })
 })
 
 alexaTest.setDynamoDBTable('skill-backspace.fm')

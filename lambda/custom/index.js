@@ -19,7 +19,6 @@ const PlayPodcastIntentHandler = {
     const episode = await podcast.getEpisodeInfo(constants.PODCAST_ID, 0)
     console.log('episode: ', episode)
     const speechText = `${constants.PODCAST_NAME_LOCALIZED} の最新エピソード「${episode.title}」を再生します`
-    const cardText = `${constants.PODCAST_NAME} の最新エピソード「${episode.title}」を再生します`
 
     return handlerInput.responseBuilder
       .speak(speechText)
@@ -70,7 +69,7 @@ const StartOverIntentHandler = {
   },
   async handle (handlerInput) {
     const token = handlerInput.requestEnvelope.context.AudioPlayer.token
-    const { _id, index } = parseToken(token)
+    const index = parseToken(token)
     const episode = await podcast.getEpisodeInfo(constants.PODCAST_ID, index)
 
     console.log(`START OVER: token ${token}`)
@@ -92,7 +91,7 @@ const FastforwardIntentHandler = {
   async handle (handlerInput) {
     const token = handlerInput.requestEnvelope.context.AudioPlayer.token
     const offset = handlerInput.requestEnvelope.context.AudioPlayer.offsetInMilliseconds
-    const { _id, index } = parseToken(token)
+    const index = parseToken(token)
     const episode = await podcast.getEpisodeInfo(constants.PODCAST_ID, index)
     const skipMinutes = util.getSlotValueAsInt(handlerInput.requestEnvelope, 'skipMinutes')
     let newOffset = offset + skipMinutes * 60000
@@ -116,7 +115,7 @@ const RewindIntentHandler = {
   async handle (handlerInput) {
     const token = handlerInput.requestEnvelope.context.AudioPlayer.token
     const offset = handlerInput.requestEnvelope.context.AudioPlayer.offsetInMilliseconds
-    const { _id, index } = parseToken(token)
+    const index = parseToken(token)
     const episode = await podcast.getEpisodeInfo(constants.PODCAST_ID, index)
     const skipMinutes = util.getSlotValueAsInt(handlerInput.requestEnvelope, 'skipMinutes')
     let newOffset = offset - skipMinutes * 60000
@@ -202,7 +201,7 @@ const ResumeIntentHandler = {
 
     const token = handlerInput.requestEnvelope.context.AudioPlayer.token
     const offset = handlerInput.requestEnvelope.context.AudioPlayer.offsetInMilliseconds
-    const { _id, index } = parseToken(token)
+    const index = parseToken(token)
     const episode = await podcast.getEpisodeInfo(constants.PODCAST_ID, index)
 
     return handlerInput.responseBuilder
@@ -220,7 +219,7 @@ const NextIntentHandler = {
   },
   async handle (handlerInput) {
     const token = handlerInput.requestEnvelope.context.AudioPlayer.token
-    const { _id, index } = parseToken(token)
+    const index = parseToken(token)
 
     const nextIndex = index + 1
     if (nextIndex >= constants.MAX_EPISODE_COUNT) {
@@ -229,7 +228,6 @@ const NextIntentHandler = {
         .getResponse()
     }
 
-    const podcastName = util.getResolvedValueName(handlerInput.requestEnvelope, 'podcastName')
     const nextToken = createToken(constants.PODCAST_ID, nextIndex)
     const episode = await podcast.getEpisodeInfo(constants.PODCAST_ID, nextIndex)
     console.log('NEXT ', nextToken, episode)
@@ -253,7 +251,7 @@ const PreviousIntentHandler = {
   },
   async handle (handlerInput) {
     const token = handlerInput.requestEnvelope.context.AudioPlayer.token
-    const { _id, index } = parseToken(token)
+    const index = parseToken(token)
 
     const nextIndex = index - 1
     if (nextIndex < 0) {
@@ -262,7 +260,6 @@ const PreviousIntentHandler = {
         .getResponse()
     }
 
-    const podcastName = util.getResolvedValueName(handlerInput.requestEnvelope, 'podcastName')
     const nextToken = createToken(constants.PODCAST_ID, nextIndex)
     const episode = await podcast.getEpisodeInfo(constants.PODCAST_ID, nextIndex)
     console.log('PREV ', nextToken, constants.PODCAST_ID, nextIndex, episode)
@@ -347,7 +344,7 @@ const SessionEndedRequestHandler = {
 
 const SystemExceptionHandler = {
   canHandle (handlerInput) {
-    return handlerInput.requestEnvelope.request.type == 'System.ExceptionEncountered'
+    return handlerInput.requestEnvelope.request.type === 'System.ExceptionEncountered'
   },
   handle (handlerInput) {
     console.error(`System exception encountered: ${handlerInput.requestEnvelope.request.reason}`)
@@ -379,11 +376,8 @@ function createToken (podcastId, episodeIndex) {
 }
 
 function parseToken (token) {
-  const [podcastId, index] = token.split(':')
-  return {
-    podcastId: podcastId,
-    index: parseInt(index)
-  }
+  const [, index] = token.split(':')
+  return parseInt(index)
 }
 
 const skillBuilder = Alexa.SkillBuilders.custom()
