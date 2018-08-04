@@ -7,6 +7,25 @@ const constants = require('./constants')
 const util = require('./alexa-utility')
 const podcast = require('./podcast')
 
+const LocalizationInterceptor = {
+  process (handlerInput) {
+    const i18n = require('i18next')
+    const sprintf = require('i18next-sprintf-postprocessor')
+    const resources = require('./resources')
+
+    const localizationClient = i18n.use(sprintf).init({
+      overloadTranslationOptionHandler: sprintf.overloadTranslationOptionHandler,
+      lng: 'ja-JP',
+      resources
+    })
+    const attributes = handlerInput.attributesManager.getRequestAttributes()
+
+    attributes.t = function (...args) {
+      return localizationClient.t(...args)
+    }
+  }
+}
+
 const PlayPodcastIntentHandler = {
   canHandle (handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'LaunchRequest' ||
@@ -14,12 +33,16 @@ const PlayPodcastIntentHandler = {
         handlerInput.requestEnvelope.request.intent.name === 'PlayPodcastIntent')
   },
   async handle (handlerInput) {
+    debugger;
+    const t = handlerInput.attributesManager.getRequestAttributes().t
     console.log('PLAY PODCAST')
 
+    debugger;
     const token = createToken(constants.PODCAST_ID, 0)
     const episode = await podcast.getEpisodeInfo(constants.PODCAST_ID, 0)
     console.log('episode: ', episode)
-    const speechText = `${constants.PODCAST_NAME_LOCALIZED} の最新エピソード「${episode.title}」を再生します`
+    debugger;
+    const speechText = t('now_start_playing_episode', constants.PODCAST_NAME_LOCALIZED, episode.title)
 
     return handlerInput.responseBuilder
       .speak(speechText)
@@ -384,6 +407,9 @@ function parseToken (token) {
 const skillBuilder = Alexa.SkillBuilders.custom()
 
 exports.handler = skillBuilder
+  .addRequestInterceptors(
+    LocalizationInterceptor
+  )
   .addRequestHandlers(
     PlayPodcastIntentHandler,
     PlayPodcastByIndexIntentHandler,
