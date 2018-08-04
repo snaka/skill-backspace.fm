@@ -3,29 +3,19 @@
 const request = require('request')
 const FeedParser = require('feedparser')
 const AWS = require('aws-sdk')
-const constants = require('./constants')
 
 AWS.config.update({
   region: process.env.AWS_REGION || 'us-east-1'
 })
 const dynamoDb = new AWS.DynamoDB.DocumentClient()
 
-const podcasts = {
-  'turingcomplete.fm': {
-    displayName: 'TURING COMPLETE FM',
-    pronunciation: 'チューリングコンプリートエフエム',
-    feedUrl: 'https://feeds.turingcomplete.fm/tcfm'
-  },
-  'backspace.fm': {
-    displayName: 'backspace.fm',
-    pronunciation: 'バックスペースエフエム',
-    feedUrl: 'http://feeds.backspace.fm/backspacefm'
-  },
-  'mozaic.fm': {
-    displayName: 'mozaic.fm',
-    pronunciation: 'モザイクエフエム',
-    feedUrl: 'http://feed.mozaic.fm/'
-  }
+const targetPodcast = exports.target = {
+  FEED_URL: 'http://feeds.backspace.fm/backspacefm',
+  TABLE_NAME: 'skill-backspace.fm',
+  ID: 'backspace.fm',
+  NAME: 'backspace.fm',
+  NAME_LOCALIZED: 'バックスペースエフエム',
+  MAX_EPISODE_COUNT: 100
 }
 
 function pickSslMediaUrl (enclosures) {
@@ -54,9 +44,9 @@ async function fetchHead (url) {
 async function saveToCache (podcastId, episodes, headers) {
   const timeStamp = Math.floor((new Date()).getTime() / 1000)
   try {
-    console.log(`saveToCache: ${podcastId} => ${constants.TABLE_NAME}`)
+    console.log(`saveToCache: ${podcastId} => ${targetPodcast.TABLE_NAME}`)
     await dynamoDb.put({
-      TableName: constants.TABLE_NAME,
+      TableName: targetPodcast.TABLE_NAME,
       Item: { podcastId, episodes, timeStamp, headers }
     }).promise()
   } catch (e) {
@@ -66,8 +56,8 @@ async function saveToCache (podcastId, episodes, headers) {
 
 async function restoreFromCache (podcastId, etag) {
   try {
-    console.log(`restoreFromCache: ${constants.TABLE_NAME} ${podcastId}`)
-    const restored = await dynamoDb.get({ TableName: constants.TABLE_NAME, Key: { podcastId } }).promise()
+    console.log(`restoreFromCache: ${targetPodcast.TABLE_NAME} ${podcastId}`)
+    const restored = await dynamoDb.get({ TableName: targetPodcast.TABLE_NAME, Key: { podcastId } }).promise()
     // console.log(`restored: ${JSON.stringify(restored)}`);
     if (restored.Item.headers.etag !== etag) {
       console.log(`ETag changed cache:${restored.Item.headers.etag} !== current:${etag}`)
@@ -79,28 +69,11 @@ async function restoreFromCache (podcastId, etag) {
   }
 }
 
-exports.availableDisplayName = () => {
-  const results = []
-  for (let podcastId in podcasts) {
-    results.push(podcasts[podcastId].displayName)
-  }
-  return results
-}
-
-exports.availablePronunciation = () => {
-  const results = []
-  for (let podcastId in podcasts) {
-    results.push(podcasts[podcastId].pronunciation)
-  }
-  return results
-}
-
 exports.getEpisodeInfo = (podcastId, index) => {
   return new Promise(async (resolve, reject) => {
-    const targetPodcast = podcasts[podcastId]
     if (!targetPodcast) throw new Error('INVALID PODCAST ID')
 
-    const head = await fetchHead(targetPodcast.feedUrl)
+    const head = await fetchHead(targetPodcast.FEED_URL)
 
     const cachedFeed = await restoreFromCache(podcastId, head.headers.etag)
     if (cachedFeed) {
@@ -112,20 +85,20 @@ exports.getEpisodeInfo = (podcastId, index) => {
     const episodes = []
     let resolved = false
 
-    request.get(targetPodcast.feedUrl)
+    request.get(targetPodcast.FEED_URL)
       .on('error', (err, res) => {
         if (err) {
           console.error(err)
           return
         }
-        console.error(`Bad status res ${res} from ${targetPodcast.feedUrl}`)
+        console.error(`Bad status res ${res} from ${targetPodcast.FEED_URL}`)
         if (res && res.code) {
-          reject(new Error(`Bad status ${res.code} from ${targetPodcast.feedUrl}`))
+          reject(new Error(`Bad status ${res.code} from ${targetPodcast.FEED_URL}`))
         }
       }).pipe(feedparser)
 
     feedparser.on('data', async (data) => {
-      if (episodes.length < constants.MAX_EPISODE_COUNT) {
+      if (episodes.length < targetPodcast.MAX_EPISODE_COUNT) {
         const audioUrl = pickSslMediaUrl(data.enclosures)
         episodes.push({
           title: data.title,
