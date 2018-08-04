@@ -7,6 +7,7 @@ const constants = require('./constants')
 const util = require('./alexa-utility')
 const podcast = require('./podcast')
 
+// ローカライズのためのインターセプター
 const LocalizationInterceptor = {
   process (handlerInput) {
     const i18n = require('i18next')
@@ -33,21 +34,18 @@ const PlayPodcastIntentHandler = {
         handlerInput.requestEnvelope.request.intent.name === 'PlayPodcastIntent')
   },
   async handle (handlerInput) {
-    debugger;
     const t = handlerInput.attributesManager.getRequestAttributes().t
     console.log('PLAY PODCAST')
 
-    debugger;
     const token = createToken(constants.PODCAST_ID, 0)
     const episode = await podcast.getEpisodeInfo(constants.PODCAST_ID, 0)
     console.log('episode: ', episode)
-    debugger;
-    const speechText = t('now_start_playing_episode', constants.PODCAST_NAME_LOCALIZED, episode.title)
+    const speechText = t('SPEECH_START_PLAYING_EPISODE', constants.PODCAST_NAME_LOCALIZED, episode.title)
 
     return handlerInput.responseBuilder
       .speak(speechText)
       .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, token, 0)
-      .withSimpleCard(`${constants.PODCAST_NAME} の最新エピソード`, speechText)
+      .withSimpleCard(t('CARD_TITLE_START_PLAYING', constants.PODCAST_NAME), speechText)
       .getResponse()
   }
 }
@@ -59,27 +57,28 @@ const PlayPodcastByIndexIntentHandler = {
   },
   async handle (handlerInput) {
     console.log('PLAY PODCAST WITH EPISODE NO.')
+    const t = handlerInput.attributesManager.getRequestAttributes().t
 
     const index = util.getSlotValueAsInt(handlerInput.requestEnvelope, 'indexOfEpisodes')
     if (index < 1 || index > constants.MAX_EPISODE_COUNT) {
       console.log('INVALID INDEX:', index)
-      const speechText = `ごめんなさい、最近の${constants.MAX_EPISODE_COUNT}エピソードまでしか対応していません。何番目のエピソードが聴きたいですか？`
-      const repromptText = '何番目のエピソードが聴きたいですか？'
+      const speechText = t('SPEECH_INVALID_EPISODE_INDEX', constants.MAX_EPISODE_COUNT)
+      const repromptText = t('PROMPT_INDEX_NUMBER')
       return handlerInput.responseBuilder
         .speak(speechText)
         .reprompt(repromptText)
-        .withSimpleCard('対応していないエピソード', speechText)
+        .withSimpleCard(t('CARD_TITLE_INVALID_EPISODE'), speechText)
         .getResponse()
     }
     const episode = await podcast.getEpisodeInfo(constants.PODCAST_ID, index - 1)
     const token = createToken(constants.PODCAST_ID, index - 1)
-    const speechText = `${constants.PODCAST_NAME_LOCALIZED} の ${index} 番目のエピソード「${episode.title}」を再生します`
-    const cardText = `${constants.PODCAST_NAME} の ${index} 番目のエピソード「${episode.title}」を再生します`
+    const speechText = t('SPEECH_START_PLAYING_EPISODE_AT', constants.PODCAST_NAME_LOCALIZED, index, episode.title)
+    const cardText = t('SPEECH_START_PLAYING_EPISODE_AT', constants.PODCAST_NAME, index, episode.title)
 
     return handlerInput.responseBuilder
       .speak(speechText)
       .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, token, 0)
-      .withSimpleCard(`${constants.PODCAST_NAME} の ${index} 番目のエピソード`, cardText)
+      .withSimpleCard(t('CARD_TITLE_PLAYING_EPISODE_AT', constants.PODCAST_NAME, index), cardText)
       .getResponse()
   }
 }
@@ -92,6 +91,8 @@ const StartOverIntentHandler = {
       request.intent.name === 'AMAZON.StartOverIntent'
   },
   async handle (handlerInput) {
+    const t = handlerInput.attributesManager.getRequestAttributes().t
+
     const token = handlerInput.requestEnvelope.context.AudioPlayer.token
     const index = parseToken(token)
     const episode = await podcast.getEpisodeInfo(constants.PODCAST_ID, index)
@@ -99,7 +100,7 @@ const StartOverIntentHandler = {
     console.log(`START OVER: token ${token}`)
 
     return handlerInput.responseBuilder
-      .speak(`先頭から再生します`)
+      .speak(t('SPEECH_START_OVER'))
       .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, token, 0)
       .getResponse()
   }
@@ -113,6 +114,8 @@ const FastforwardIntentHandler = {
       request.intent.name === 'FastforwardIntent'
   },
   async handle (handlerInput) {
+    const t = handlerInput.attributesManager.getRequestAttributes().t
+
     const token = handlerInput.requestEnvelope.context.AudioPlayer.token
     const offset = handlerInput.requestEnvelope.context.AudioPlayer.offsetInMilliseconds
     const index = parseToken(token)
@@ -123,7 +126,7 @@ const FastforwardIntentHandler = {
     console.log(`FASTFORWARD: token ${token} offset ${offset} skipMinutes ${skipMinutes}`)
 
     return handlerInput.responseBuilder
-      .speak(`${skipMinutes}分進めます`)
+      .speak(t('SPEECH_FASTFORWARD_X_MIN', skipMinutes))
       .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, token, newOffset)
       .getResponse()
   }
@@ -137,6 +140,8 @@ const RewindIntentHandler = {
       request.intent.name === 'RewindIntent'
   },
   async handle (handlerInput) {
+    const t = handlerInput.attributesManager.getRequestAttributes().t
+
     const token = handlerInput.requestEnvelope.context.AudioPlayer.token
     const offset = handlerInput.requestEnvelope.context.AudioPlayer.offsetInMilliseconds
     const index = parseToken(token)
@@ -148,7 +153,7 @@ const RewindIntentHandler = {
     console.log(`FASTFORWARD: token ${token} offset ${offset} skipMinutes ${skipMinutes}`)
 
     return handlerInput.responseBuilder
-      .speak(`${skipMinutes}分戻ります`)
+      .speak(t('SPEECH_REWIND_X_MIN', skipMinutes))
       .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, token, newOffset)
       .getResponse()
   }
@@ -163,13 +168,15 @@ const HelpIntentHandler = {
   },
   handle (handlerInput) {
     console.log('HELP')
-    const speechText = `バックスペースエフエムプレイヤーではバックスペースエフエムで配信中の最新から${constants.MAX_EPISODE_COUNT}番目のエピソードを聴くことができます。何番目のエピソードが聴きたいですか？`
-    const repromptText = '何番目のエピソードが聴きたいですか？'
+    const t = handlerInput.attributesManager.getRequestAttributes().t
+
+    const speechText = t('SPEECH_HELP', constants.MAX_EPISODE_COUNT)
+    const repromptText = t('PROMPT_INDEX_NUMBER')
 
     return handlerInput.responseBuilder
       .speak(speechText)
       .reprompt(repromptText)
-      .withSimpleCard('backspace.fm プレイヤーについて', speechText)
+      .withSimpleCard(t('CARD_TITLE_ABOUT_SKILL'), speechText)
       .getResponse()
   }
 }
@@ -184,24 +191,25 @@ const CancelAndStopIntentHandler = {
   },
   handle (handlerInput) {
     console.log(handlerInput.requestEnvelope.context.AudioPlayer)
+    const t = handlerInput.attributesManager.getRequestAttributes().t
 
     const playerActivity = handlerInput.requestEnvelope.context.AudioPlayer.playerActivity
     const token = handlerInput.requestEnvelope.context.AudioPlayer.token
     const offset = handlerInput.requestEnvelope.context.AudioPlayer.offsetInMilliseconds
-
     const request = handlerInput.requestEnvelope.request
-    let speechText
+
     if (playerActivity === 'PLAYING') {
       return handlerInput.responseBuilder
         .addAudioPlayerStopDirective()
         .getResponse()
     }
 
+    let speechText
     switch (request.intent.name) {
       case 'AMAZON.CancelIntent':
       case 'AMAZON.StopIntent':
       case 'AMAZON.PauseIntent':
-        speechText = '停止します'
+        speechText = t('SPEECH_STOP')
         break
     }
 
@@ -242,13 +250,14 @@ const NextIntentHandler = {
       request.intent.name === 'AMAZON.NextIntent'
   },
   async handle (handlerInput) {
+    const t = handlerInput.attributesManager.getRequestAttributes().t
     const token = handlerInput.requestEnvelope.context.AudioPlayer.token
     const index = parseToken(token)
 
     const nextIndex = index + 1
     if (nextIndex >= constants.MAX_EPISODE_COUNT) {
       return handlerInput.responseBuilder
-        .speak('次のエピソードはありません')
+        .speak(t('SPEECH_NEXT_EPISODE_NOT_EXIST'))
         .getResponse()
     }
 
@@ -256,12 +265,12 @@ const NextIntentHandler = {
     const episode = await podcast.getEpisodeInfo(constants.PODCAST_ID, nextIndex)
     console.log('NEXT ', nextToken, episode)
 
-    const speechText = `${nextIndex + 1}番目のエピソード「${episode.title}」を再生します`
+    const speechText = t('SPEECH_EPISODE_AT_X_WILL_START', nextIndex + 1, episode.title)
 
     return handlerInput.responseBuilder
       .speak(speechText)
       .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, nextToken, 0)
-      .withSimpleCard(`${constants.PODCAST_NAME} の ${nextIndex + 1} 番目のエピソード`, speechText)
+      .withSimpleCard(t('CARD_TITLE_EPISODE_AT_X', constants.PODCAST_NAME, nextIndex + 1), speechText)
       .getResponse()
   }
 }
@@ -274,13 +283,14 @@ const PreviousIntentHandler = {
       request.intent.name === 'AMAZON.PreviousIntent'
   },
   async handle (handlerInput) {
+    const t = handlerInput.attributesManager.getRequestAttributes().t
     const token = handlerInput.requestEnvelope.context.AudioPlayer.token
     const index = parseToken(token)
 
     const nextIndex = index - 1
     if (nextIndex < 0) {
       return handlerInput.responseBuilder
-        .speak('前のエピソードはありません')
+        .speak(t('SPEECH_PREV_EPISODE_NOT_EXIST'))
         .getResponse()
     }
 
@@ -288,12 +298,12 @@ const PreviousIntentHandler = {
     const episode = await podcast.getEpisodeInfo(constants.PODCAST_ID, nextIndex)
     console.log('PREV ', nextToken, constants.PODCAST_ID, nextIndex, episode)
 
-    const speechText = `${nextIndex + 1}番目のエピソード「${episode.title}」を再生します`
+    const speechText = t('SPEECH_EPISODE_AT_X_WILL_START', nextIndex + 1, episode.title)
 
     return handlerInput.responseBuilder
       .speak(speechText)
       .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, nextToken, 0)
-      .withSimpleCard(`${constants.PODCAST_NAME} の ${nextIndex + 1} 番目のエピソード`, speechText)
+      .withSimpleCard(t('CARD_TITLE_EPISODE_AT_X', constants.PODCAST_NAME, nextIndex + 1), speechText)
       .getResponse()
   }
 }
@@ -310,8 +320,10 @@ const UnsupportedIntentHandler = {
       request.intent.name === 'AMAZON.ShuffleOffIntent')
   },
   handle (handlerInput) {
+    const t = handlerInput.attributesManager.getRequestAttributes().t
+
     return handlerInput.responseBuilder
-      .speak('すみません、その操作には対応していません')
+      .speak(t('SPEECH_UNSUPPORTED_INTENT'))
       .getResponse()
   }
 }
@@ -380,7 +392,8 @@ const ErrorHandler = {
     return true
   },
   handle (handlerInput, error) {
-    const speechText = 'ごめんなさい、よく理解できませんでした。'
+    const t = handlerInput.attributesManager.getRequestAttributes().t
+    const speechText = t('SPEECH_ERROR_OCCURRED')
     console.log(handlerInput.requestEnvelope.request.intent)
     console.log(`ERROR: ${error.message}`)
 
