@@ -13,9 +13,9 @@
     "ask-sdk-core": "^2.0.0",
     "ask-sdk-model": "^1.0.0",
     "aws-sdk": "^2.283.1",
+    "feedparser": "^2.2.9",
     "i18next": "^11.5.0",
     "i18next-sprintf-postprocessor": "^0.2.2",
-    "node-feedparser": "^1.0.1",
     "request": "^2.87.0"
   },
   "devDependencies": {
