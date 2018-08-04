@@ -3,7 +3,6 @@
 'use strict'
 
 const Alexa = require('ask-sdk-core')
-const util = require('./alexa-utility')
 const podcast = require('./podcast')
 
 // ローカライズのためのインターセプター
@@ -36,15 +35,15 @@ const PlayPodcastIntentHandler = {
     const t = handlerInput.attributesManager.getRequestAttributes().t
     console.log('PLAY PODCAST')
 
-    const token = createToken(podcast.target.ID, 0)
-    const episode = await podcast.getEpisodeInfo(podcast.target.ID, 0)
+    const token = createToken(podcast.config.ID, 0)
+    const episode = await podcast.getEpisodeInfo(podcast.config.ID, 0)
     console.log('episode: ', episode)
-    const speechText = t('SPEECH_START_PLAYING_EPISODE', podcast.target.NAME_LOCALIZED, episode.title)
+    const speechText = t('SPEECH_START_PLAYING_EPISODE', podcast.config.NAME_LOCALIZED, episode.title)
 
     return handlerInput.responseBuilder
       .speak(speechText)
       .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, token, 0)
-      .withSimpleCard(t('CARD_TITLE_START_PLAYING', podcast.target.NAME), speechText)
+      .withSimpleCard(t('CARD_TITLE_START_PLAYING', podcast.config.NAME), speechText)
       .getResponse()
   }
 }
@@ -58,10 +57,10 @@ const PlayPodcastByIndexIntentHandler = {
     console.log('PLAY PODCAST WITH EPISODE NO.')
     const t = handlerInput.attributesManager.getRequestAttributes().t
 
-    const index = util.getSlotValueAsInt(handlerInput.requestEnvelope, 'indexOfEpisodes')
-    if (index < 1 || index > podcast.target.MAX_EPISODE_COUNT) {
+    const index = getSlotValueAsInt(handlerInput.requestEnvelope, 'indexOfEpisodes')
+    if (index < 1 || index > podcast.config.MAX_EPISODE_COUNT) {
       console.log('INVALID INDEX:', index)
-      const speechText = t('SPEECH_INVALID_EPISODE_INDEX', podcast.target.MAX_EPISODE_COUNT)
+      const speechText = t('SPEECH_INVALID_EPISODE_INDEX', podcast.config.MAX_EPISODE_COUNT)
       const repromptText = t('PROMPT_INDEX_NUMBER')
       return handlerInput.responseBuilder
         .speak(speechText)
@@ -69,15 +68,15 @@ const PlayPodcastByIndexIntentHandler = {
         .withSimpleCard(t('CARD_TITLE_INVALID_EPISODE'), speechText)
         .getResponse()
     }
-    const episode = await podcast.getEpisodeInfo(podcast.target.ID, index - 1)
-    const token = createToken(podcast.target.ID, index - 1)
-    const speechText = t('SPEECH_START_PLAYING_EPISODE_AT', podcast.target.NAME_LOCALIZED, index, episode.title)
-    const cardText = t('SPEECH_START_PLAYING_EPISODE_AT', podcast.target.NAME, index, episode.title)
+    const episode = await podcast.getEpisodeInfo(podcast.config.ID, index - 1)
+    const token = createToken(podcast.config.ID, index - 1)
+    const speechText = t('SPEECH_START_PLAYING_EPISODE_AT', podcast.config.NAME_LOCALIZED, index, episode.title)
+    const cardText = t('SPEECH_START_PLAYING_EPISODE_AT', podcast.config.NAME, index, episode.title)
 
     return handlerInput.responseBuilder
       .speak(speechText)
       .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, token, 0)
-      .withSimpleCard(t('CARD_TITLE_PLAYING_EPISODE_AT', podcast.target.NAME, index), cardText)
+      .withSimpleCard(t('CARD_TITLE_PLAYING_EPISODE_AT', podcast.config.NAME, index), cardText)
       .getResponse()
   }
 }
@@ -94,7 +93,7 @@ const StartOverIntentHandler = {
 
     const token = handlerInput.requestEnvelope.context.AudioPlayer.token
     const index = parseToken(token)
-    const episode = await podcast.getEpisodeInfo(podcast.target.ID, index)
+    const episode = await podcast.getEpisodeInfo(podcast.config.ID, index)
 
     console.log(`START OVER: token ${token}`)
 
@@ -118,8 +117,8 @@ const FastforwardIntentHandler = {
     const token = handlerInput.requestEnvelope.context.AudioPlayer.token
     const offset = handlerInput.requestEnvelope.context.AudioPlayer.offsetInMilliseconds
     const index = parseToken(token)
-    const episode = await podcast.getEpisodeInfo(podcast.target.ID, index)
-    const skipMinutes = util.getSlotValueAsInt(handlerInput.requestEnvelope, 'skipMinutes')
+    const episode = await podcast.getEpisodeInfo(podcast.config.ID, index)
+    const skipMinutes = getSlotValueAsInt(handlerInput.requestEnvelope, 'skipMinutes')
     let newOffset = offset + skipMinutes * 60000
 
     console.log(`FASTFORWARD: token ${token} offset ${offset} skipMinutes ${skipMinutes}`)
@@ -144,8 +143,8 @@ const RewindIntentHandler = {
     const token = handlerInput.requestEnvelope.context.AudioPlayer.token
     const offset = handlerInput.requestEnvelope.context.AudioPlayer.offsetInMilliseconds
     const index = parseToken(token)
-    const episode = await podcast.getEpisodeInfo(podcast.target.ID, index)
-    const skipMinutes = util.getSlotValueAsInt(handlerInput.requestEnvelope, 'skipMinutes')
+    const episode = await podcast.getEpisodeInfo(podcast.config.ID, index)
+    const skipMinutes = getSlotValueAsInt(handlerInput.requestEnvelope, 'skipMinutes')
     let newOffset = offset - skipMinutes * 60000
     if (newOffset < 0) newOffset = 0
 
@@ -169,7 +168,7 @@ const HelpIntentHandler = {
     console.log('HELP')
     const t = handlerInput.attributesManager.getRequestAttributes().t
 
-    const speechText = t('SPEECH_HELP', podcast.target.MAX_EPISODE_COUNT)
+    const speechText = t('SPEECH_HELP', podcast.config.MAX_EPISODE_COUNT)
     const repromptText = t('PROMPT_INDEX_NUMBER')
 
     return handlerInput.responseBuilder
@@ -233,7 +232,7 @@ const ResumeIntentHandler = {
     const token = handlerInput.requestEnvelope.context.AudioPlayer.token
     const offset = handlerInput.requestEnvelope.context.AudioPlayer.offsetInMilliseconds
     const index = parseToken(token)
-    const episode = await podcast.getEpisodeInfo(podcast.target.ID, index)
+    const episode = await podcast.getEpisodeInfo(podcast.config.ID, index)
 
     return handlerInput.responseBuilder
       .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, token, offset)
@@ -254,14 +253,14 @@ const NextIntentHandler = {
     const index = parseToken(token)
 
     const nextIndex = index + 1
-    if (nextIndex >= podcast.target.MAX_EPISODE_COUNT) {
+    if (nextIndex >= podcast.config.MAX_EPISODE_COUNT) {
       return handlerInput.responseBuilder
         .speak(t('SPEECH_NEXT_EPISODE_NOT_EXIST'))
         .getResponse()
     }
 
-    const nextToken = createToken(podcast.target.ID, nextIndex)
-    const episode = await podcast.getEpisodeInfo(podcast.target.ID, nextIndex)
+    const nextToken = createToken(podcast.config.ID, nextIndex)
+    const episode = await podcast.getEpisodeInfo(podcast.config.ID, nextIndex)
     console.log('NEXT ', nextToken, episode)
 
     const speechText = t('SPEECH_EPISODE_AT_X_WILL_START', nextIndex + 1, episode.title)
@@ -269,7 +268,7 @@ const NextIntentHandler = {
     return handlerInput.responseBuilder
       .speak(speechText)
       .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, nextToken, 0)
-      .withSimpleCard(t('CARD_TITLE_EPISODE_AT_X', podcast.target.NAME, nextIndex + 1), speechText)
+      .withSimpleCard(t('CARD_TITLE_EPISODE_AT_X', podcast.config.NAME, nextIndex + 1), speechText)
       .getResponse()
   }
 }
@@ -293,16 +292,16 @@ const PreviousIntentHandler = {
         .getResponse()
     }
 
-    const nextToken = createToken(podcast.target.ID, nextIndex)
-    const episode = await podcast.getEpisodeInfo(podcast.target.ID, nextIndex)
-    console.log('PREV ', nextToken, podcast.target.ID, nextIndex, episode)
+    const nextToken = createToken(podcast.config.ID, nextIndex)
+    const episode = await podcast.getEpisodeInfo(podcast.config.ID, nextIndex)
+    console.log('PREV ', nextToken, podcast.config.ID, nextIndex, episode)
 
     const speechText = t('SPEECH_EPISODE_AT_X_WILL_START', nextIndex + 1, episode.title)
 
     return handlerInput.responseBuilder
       .speak(speechText)
       .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, nextToken, 0)
-      .withSimpleCard(t('CARD_TITLE_EPISODE_AT_X', podcast.target.NAME, nextIndex + 1), speechText)
+      .withSimpleCard(t('CARD_TITLE_EPISODE_AT_X', podcast.config.NAME, nextIndex + 1), speechText)
       .getResponse()
   }
 }
@@ -414,6 +413,20 @@ function createToken (podcastId, episodeIndex) {
 function parseToken (token) {
   const [, index] = token.split(':')
   return parseInt(index)
+}
+
+function getSlotValueAsInt (envelope, slotName) {
+  if (
+    envelope &&
+    envelope.request &&
+    envelope.request.intent &&
+    envelope.request.intent.slots &&
+    envelope.request.intent.slots[slotName] &&
+    envelope.request.intent.slots[slotName].value) {
+    return parseInt(envelope.request.intent.slots[slotName].value)
+  } else {
+    return 0
+  }
 }
 
 const skillBuilder = Alexa.SkillBuilders.custom()

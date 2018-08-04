@@ -9,7 +9,7 @@ AWS.config.update({
 })
 const dynamoDb = new AWS.DynamoDB.DocumentClient()
 
-const targetPodcast = exports.target = {
+const targetPodcast = exports.config = {
   FEED_URL: 'http://feeds.backspace.fm/backspacefm',
   TABLE_NAME: 'skill-backspace.fm',
   ID: 'backspace.fm',
