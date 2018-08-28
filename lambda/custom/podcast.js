@@ -2,7 +2,8 @@
 
 const request = require('request')
 const FeedParser = require('feedparser')
-const AWS = require('aws-sdk')
+const awsXRay = require('aws-xray-sdk')
+const AWS = awsXRay.captureAWS(require('aws-sdk'))
 
 AWS.config.update({
   region: process.env.AWS_REGION || 'us-east-1'
@@ -11,7 +12,7 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient()
 
 const targetPodcast = exports.config = {
   FEED_URL: 'http://feeds.backspace.fm/backspacefm',
-  TABLE_NAME: 'skill-backspace.fm',
+  TABLE_NAME: 'alexa-skill-podcasts-player',
   ID: 'backspace.fm',
   NAME: 'backspace.fm',
   NAME_LOCALIZED: 'バックスペースエフエム',
@@ -31,13 +32,17 @@ function pickSslMediaUrl (enclosures) {
 
 async function fetchHead (url) {
   return new Promise((resolve, reject) => {
-    request.head(url)
-      .on('response', (res) => {
-        resolve(res)
-      })
-      .on('error', (err) => {
-        reject(err)
-      })
+    awsXRay.captureAsyncFunc('fetchHead', (subsegment) => {
+      request.head(url)
+        .on('response', (res) => {
+          resolve(res)
+          subsegment.close()
+        })
+        .on('error', (err) => {
+          reject(err)
+          subsegment.close()
+        })
+    })
   })
 }
 
@@ -54,13 +59,14 @@ async function saveToCache (podcastId, episodes, headers) {
   }
 }
 
-async function restoreFromCache (podcastId, etag) {
+async function restoreFromCache (podcastId, etag, forceUseCache = false) {
   try {
     console.log(`restoreFromCache: ${targetPodcast.TABLE_NAME} ${podcastId}`)
     const restored = await dynamoDb.get({ TableName: targetPodcast.TABLE_NAME, Key: { podcastId } }).promise()
     // console.log(`restored: ${JSON.stringify(restored)}`);
-    if (restored.Item.headers.etag !== etag) {
-      console.log(`ETag changed cache:${restored.Item.headers.etag} !== current:${etag}`)
+    const cachedEtag = (((restored || {}).Item || {}).headers || {}).etag
+    if (!forceUseCache && cachedEtag !== etag) {
+      console.log(`ETag changed cache:${cachedEtag} !== current:${etag}`)
       return undefined
     }
     return restored.Item.episodes
@@ -69,55 +75,82 @@ async function restoreFromCache (podcastId, etag) {
   }
 }
 
-exports.getEpisodeInfo = (podcastId, index) => {
+exports.getEpisodeInfo = (podcastId, index, forceUseCache = true) => {
   return new Promise(async (resolve, reject) => {
-    if (!targetPodcast) throw new Error('INVALID PODCAST ID')
+    awsXRay.captureAsyncFunc('getEpisodeInfo', async (segGetEpisodeInfo) => {
+      if (!targetPodcast) throw new Error('INVALID PODCAST ID')
 
-    const head = await fetchHead(targetPodcast.FEED_URL)
+      let etag = ''
+      if (!forceUseCache) {
+        const head = await fetchHead(targetPodcast.FEED_URL)
+        etag = head.headers.etag
+      }
 
-    const cachedFeed = await restoreFromCache(podcastId, head.headers.etag)
-    if (cachedFeed) {
-      resolve(cachedFeed[index])
-      return
-    }
+      const cachedFeed = await restoreFromCache(podcastId, etag, forceUseCache)
+      if (cachedFeed) {
+        resolve(cachedFeed[index])
+        segGetEpisodeInfo.close()
+        return
+      }
 
-    const feedparser = new FeedParser()
-    const episodes = []
-    let resolved = false
+      console.log('CACHE INVALIDATED')
 
-    request.get(targetPodcast.FEED_URL)
-      .on('error', (err, res) => {
-        if (err) {
-          console.error(err)
-          return
-        }
-        console.error(`Bad status res ${res} from ${targetPodcast.FEED_URL}`)
-        if (res && res.code) {
-          reject(new Error(`Bad status ${res.code} from ${targetPodcast.FEED_URL}`))
-        }
-      }).pipe(feedparser)
+      const feedparser = new FeedParser()
+      const episodes = []
+      let resolved = false
 
-    feedparser.on('data', async (data) => {
-      if (episodes.length < targetPodcast.MAX_EPISODE_COUNT) {
-        const audioUrl = pickSslMediaUrl(data.enclosures)
-        episodes.push({
-          title: data.title,
-          url: audioUrl,
-          published_at: data.pubDate.toISOString()
-        })
-      } else {
-        if (!resolved) {
-          try {
+      request.get(targetPodcast.FEED_URL)
+        .on('error', (err, res) => {
+          if (err) {
+            console.error(err)
+            return
+          }
+          console.error(`Bad status res ${res} from ${targetPodcast.FEED_URL}`)
+          if (res && res.code) {
+            reject(new Error(`Bad status ${res.code} from ${targetPodcast.FEED_URL}`))
+          }
+        }).pipe(feedparser)
+
+      feedparser.on('data', async (data) => {
+        console.log('on data:', data.title)
+        if (episodes.length < targetPodcast.MAX_EPISODE_COUNT) {
+          const audioUrl = pickSslMediaUrl(data.enclosures)
+          episodes.push({
+            title: data.title,
+            url: audioUrl,
+            published_at: data.pubDate.toISOString()
+          })
+        } else {
+          if (!resolved) {
             console.log(`data resolved ${data.title}`)
             resolved = true
-            await saveToCache(podcastId, episodes, head.headers)
-            console.log('episodes[index]:', episodes[index])
-            resolve(episodes[index])
-          } catch (e) {
-            console.log(e)
+            try {
+              await saveToCache(podcastId, episodes, head.headers)
+              console.log('episodes[index]:', episodes[index])
+              resolve(episodes[index])
+              segGetEpisodeInfo.close()
+            } catch (e) {
+              console.log(e)
+            }
           }
         }
-      }
+      })
+
+      feedparser.on('end', async () => {
+        console.log('on end')
+        try {
+          await saveToCache(podcastId, episodes, head.headers)
+          console.log('episodes[index]:', episodes[index])
+          resolve(episodes[index])
+          segGetEpisodeInfo.close()
+        } catch (e) {
+          console.log(e)
+        }
+      })
+
+      feedparser.on('error', () => {
+        console.log('on error')
+      })
     })
   })
 }
