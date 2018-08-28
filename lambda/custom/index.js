@@ -5,6 +5,13 @@
 const Alexa = require('ask-sdk-core')
 const podcast = require('./podcast')
 
+// ログ用のインターセプター
+const LoggingInterceptor = {
+  process (handlerInput) {
+    console.log('REQUEST:', JSON.stringify(handlerInput))
+  }
+}
+
 // ローカライズのためのインターセプター
 const LocalizationInterceptor = {
   process (handlerInput) {
@@ -22,6 +29,15 @@ const LocalizationInterceptor = {
     attributes.t = function (...args) {
       return localizationClient.t(...args)
     }
+  }
+}
+
+const WarmUpHandler = {
+  canHandle (handlerInput) {
+    return handlerInput.requestEnvelope.source === 'serverless-plugin-warmup'
+  },
+  handle (handlerInput) {
+    console.log('WarmUP - Lambda is warm!')
   }
 }
 
@@ -57,7 +73,19 @@ const PlayPodcastByIndexIntentHandler = {
     console.log('PLAY PODCAST WITH EPISODE NO.')
     const t = handlerInput.attributesManager.getRequestAttributes().t
 
-    const index = getSlotValueAsInt(handlerInput.requestEnvelope, 'indexOfEpisodes')
+    let index
+    try {
+      index = getSlotValueAsInt(handlerInput.requestEnvelope, 'indexOfEpisodes')
+    } catch (e) {
+      const speechText = t('SPEECH_INVALID_EPISODE_INDEX', podcast.config.MAX_EPISODE_COUNT)
+      const repromptText = t('PROMPT_INDEX_NUMBER')
+      return handlerInput.responseBuilder
+        .speak(speechText)
+        .reprompt(repromptText)
+        .withSimpleCard(t('CARD_TITLE_INVALID_EPISODE'), speechText)
+        .getResponse()
+    }
+
     if (index < 1 || index > podcast.config.MAX_EPISODE_COUNT) {
       console.log('INVALID INDEX:', index)
       const speechText = t('SPEECH_INVALID_EPISODE_INDEX', podcast.config.MAX_EPISODE_COUNT)
@@ -115,10 +143,19 @@ const FastforwardIntentHandler = {
     const t = handlerInput.attributesManager.getRequestAttributes().t
 
     const token = handlerInput.requestEnvelope.context.AudioPlayer.token
+    if (!token) {
+      const speechText = t('SPEECH_PLAYER_STATE_IS_NOT_PLAYING', podcast.config.MAX_EPISODE_COUNT)
+      return handlerInput.responseBuilder
+        .speak(speechText)
+        .getResponse()
+    }
+
     const offset = handlerInput.requestEnvelope.context.AudioPlayer.offsetInMilliseconds
     const index = parseToken(token)
     const episode = await podcast.getEpisodeInfo(podcast.config.ID, index)
+
     const skipMinutes = getSlotValueAsInt(handlerInput.requestEnvelope, 'skipMinutes')
+
     let newOffset = offset + skipMinutes * 60000
 
     console.log(`FASTFORWARD: token ${token} offset ${offset} skipMinutes ${skipMinutes}`)
@@ -141,10 +178,19 @@ const RewindIntentHandler = {
     const t = handlerInput.attributesManager.getRequestAttributes().t
 
     const token = handlerInput.requestEnvelope.context.AudioPlayer.token
+    if (!token) {
+      const speechText = t('SPEECH_PLAYER_STATE_IS_NOT_PLAYING', podcast.config.MAX_EPISODE_COUNT)
+      return handlerInput.responseBuilder
+        .speak(speechText)
+        .getResponse()
+    }
+
     const offset = handlerInput.requestEnvelope.context.AudioPlayer.offsetInMilliseconds
     const index = parseToken(token)
     const episode = await podcast.getEpisodeInfo(podcast.config.ID, index)
+
     const skipMinutes = getSlotValueAsInt(handlerInput.requestEnvelope, 'skipMinutes')
+
     let newOffset = offset - skipMinutes * 60000
     if (newOffset < 0) newOffset = 0
 
@@ -188,7 +234,6 @@ const CancelAndStopIntentHandler = {
         request.intent.name === 'AMAZON.PauseIntent')
   },
   handle (handlerInput) {
-    console.log(handlerInput.requestEnvelope.context.AudioPlayer)
     const t = handlerInput.attributesManager.getRequestAttributes().t
 
     const playerActivity = handlerInput.requestEnvelope.context.AudioPlayer.playerActivity
@@ -227,8 +272,6 @@ const ResumeIntentHandler = {
       request.intent.name === 'AMAZON.ResumeIntent'
   },
   async handle (handlerInput) {
-    console.log(handlerInput.requestEnvelope.context.AudioPlayer)
-
     const token = handlerInput.requestEnvelope.context.AudioPlayer.token
     const offset = handlerInput.requestEnvelope.context.AudioPlayer.offsetInMilliseconds
     const index = parseToken(token)
@@ -337,8 +380,6 @@ const AudioPlayerEventHandler = {
     } = handlerInput
     const audioPlayerEventName = requestEnvelope.request.type.split('.')[1]
 
-    console.log('handlerInput: ', handlerInput)
-
     let token = getToken(handlerInput)
 
     switch (audioPlayerEventName) {
@@ -392,15 +433,15 @@ const ErrorHandler = {
   handle (handlerInput, error) {
     const t = handlerInput.attributesManager.getRequestAttributes().t
     const speechText = t('SPEECH_ERROR_OCCURRED')
-    console.log(handlerInput.requestEnvelope.request.intent)
     console.log(`ERROR: ${error.message}`)
 
     return handlerInput.responseBuilder
       .speak(speechText)
-      .reprompt(speechText)
       .getResponse()
   }
 }
+
+class InvalidSlotValueError extends Error {}
 
 function getToken (handlerInput) {
   return handlerInput.requestEnvelope.request.token
@@ -411,7 +452,7 @@ function createToken (podcastId, episodeIndex) {
 }
 
 function parseToken (token) {
-  const [, index] = token.split(':')
+  const [, index] = (token || '').split(':')
   return parseInt(index)
 }
 
@@ -423,7 +464,11 @@ function getSlotValueAsInt (envelope, slotName) {
     envelope.request.intent.slots &&
     envelope.request.intent.slots[slotName] &&
     envelope.request.intent.slots[slotName].value) {
-    return parseInt(envelope.request.intent.slots[slotName].value)
+    const parsedInt = parseInt(envelope.request.intent.slots[slotName].value)
+    if (!Number.isInteger(parsedInt)) {
+      throw new InvalidSlotValueError(`slotName: ${slotName}'s value '${parsedInt}' is not integer.`)
+    }
+    return parsedInt
   } else {
     return 0
   }
@@ -433,9 +478,11 @@ const skillBuilder = Alexa.SkillBuilders.custom()
 
 exports.handler = skillBuilder
   .addRequestInterceptors(
-    LocalizationInterceptor
+    LocalizationInterceptor,
+    LoggingInterceptor
   )
   .addRequestHandlers(
+    WarmUpHandler,
     PlayPodcastIntentHandler,
     PlayPodcastByIndexIntentHandler,
     StartOverIntentHandler,
