@@ -1,5 +1,9 @@
 service: skill-backspace-fm
 
+plugins:
+  - serverless-plugin-warmup
+  - serverless-plugin-tracing
+
 provider:
   name: aws
   region: ap-northeast-1
@@ -13,6 +17,26 @@ provider:
         - "dynamodb:DeleteItem"
         - "dynamodb:GetItem"
       Resource: "*"
+    - Effect: "Allow"
+      Action:
+        - "lambda:InvokeFunction"
+      Resource:
+        - Fn::Join:
+          - ":"
+          -
+            - arn:aws:lambda
+            - Ref: AWS::Region
+            - Ref: AWS::AccountId
+            - function:${self:service}-${opt:stage, self:provider.stage}-*
+    - Effect: "Allow"
+      Action:
+        - "xray:PutTraceSegments"
+        - "xray:PutTelemetryRecords"
+      Resource: "*"
+
+custom:
+  warmup:
+    memorySize: 128
 
 package:
   include:
@@ -20,8 +44,13 @@ package:
 
 functions:
   main:
+    warmup: true
     handler: index.handler
     events:
       - alexaSkill:
           appId: ${env:SKILL_ID}
           enabled: true
+  cacheUpdator:
+    handler: cacheUpdator.handler
+    events:
+      - schedule: rate(60 minutes)
