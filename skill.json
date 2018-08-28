@@ -30,12 +30,12 @@
     "apis": {
       "custom": {
         "endpoint": {
-          "uri": "arn:aws:lambda:ap-northeast-1:105394972992:function:skill-backspace-fm-dev-main"
+          "uri": "arn:aws:lambda:ap-northeast-1:105394972992:function:skill-backspace-fm-prod-main"
         },
         "regions": {
           "FE": {
             "endpoint": {
-              "uri": "arn:aws:lambda:ap-northeast-1:105394972992:function:skill-backspace-fm-dev-main"
+              "uri": "arn:aws:lambda:ap-northeast-1:105394972992:function:skill-backspace-fm-prod-main"
             }
           }
         },
