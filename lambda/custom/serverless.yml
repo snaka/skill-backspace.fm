@@ -6,6 +6,7 @@ plugins:
 
 provider:
   name: aws
+  tracing: true
   region: ap-northeast-1
   runtime: nodejs8.10
   memorySize: 128
