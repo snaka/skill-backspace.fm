@@ -81,8 +81,9 @@ exports.getEpisodeInfo = (podcastId, index, forceUseCache = true) => {
       if (!targetPodcast) throw new Error('INVALID PODCAST ID')
 
       let etag = ''
+      let head
       if (!forceUseCache) {
-        const head = await fetchHead(targetPodcast.FEED_URL)
+        head = await fetchHead(targetPodcast.FEED_URL)
         etag = head.headers.etag
       }
 
