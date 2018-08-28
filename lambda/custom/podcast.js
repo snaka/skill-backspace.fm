@@ -16,7 +16,7 @@ const targetPodcast = exports.config = {
   ID: 'backspace.fm',
   NAME: 'backspace.fm',
   NAME_LOCALIZED: 'バックスペースエフエム',
-  MAX_EPISODE_COUNT: 100
+  MAX_EPISODE_COUNT: 500
 }
 
 function pickSslMediaUrl (enclosures) {
