@@ -27,6 +27,8 @@
     "eslint-plugin-promise": "^3.8.0",
     "eslint-plugin-standard": "^3.1.0",
     "mocha": "^5.2.0",
-    "nock": "^9.4.4"
+    "nock": "^9.4.4",
+    "serverless-plugin-tracing": "^2.0.0",
+    "serverless-plugin-warmup": "^3.6.2-rc.1"
   }
 }
