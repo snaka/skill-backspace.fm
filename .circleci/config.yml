@@ -10,6 +10,9 @@ jobs:
 
     working_directory: ~/repo/lambda/custom
 
+    environment:
+      AWS_XRAY_CONTEXT_MISSING: LOG_ERROR
+
     steps:
       - checkout:
           path: ~/repo
