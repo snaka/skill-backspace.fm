@@ -113,7 +113,7 @@ exports.getEpisodeInfo = (podcastId, index, forceUseCache = true) => {
         }).pipe(feedparser)
 
       feedparser.on('data', async (data) => {
-        console.log('on data:', data.title)
+        // console.log('on data:', data.title)
         if (episodes.length < targetPodcast.MAX_EPISODE_COUNT) {
           const audioUrl = pickSslMediaUrl(data.enclosures)
           episodes.push({

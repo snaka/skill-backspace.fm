@@ -10,6 +10,7 @@ alexaTest.initialize(
   'amzn1.ask.device.LONG_STRING'
 )
 alexaTest.setLocale('ja-JP')
+alexaTest.setDynamoDBTable('alexa-skill-podcasts-player')
 
 beforeEach(() => {
   // RSSフィードの読み込みをMockに差し替える
@@ -24,7 +25,6 @@ beforeEach(() => {
     .replyWithFile(200, path.join(__dirname, '/replies/backspace.fm.xml'), { 'Content-Type': 'text/xml; charset=UTF-8' })
 })
 
-alexaTest.setDynamoDBTable('skill-backspace.fm')
 
 describe('スキル起動時', () => {
   alexaTest.test([
