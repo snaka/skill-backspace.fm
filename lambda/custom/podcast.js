@@ -90,7 +90,7 @@ exports.getEpisodeInfo = (podcastId, index, forceUseCache = true) => {
       const cachedFeed = await restoreFromCache(podcastId, etag, forceUseCache)
       if (cachedFeed) {
         resolve(cachedFeed[index])
-        segGetEpisodeInfo.close()
+        if (segGetEpisodeInfo) segGetEpisodeInfo.close()
         return
       }
 
@@ -129,7 +129,7 @@ exports.getEpisodeInfo = (podcastId, index, forceUseCache = true) => {
               await saveToCache(podcastId, episodes, head.headers)
               console.log('episodes[index]:', episodes[index])
               resolve(episodes[index])
-              segGetEpisodeInfo.close()
+              if (segGetEpisodeInfo) segGetEpisodeInfo.close()
             } catch (e) {
               console.log(e)
             }
@@ -143,7 +143,7 @@ exports.getEpisodeInfo = (podcastId, index, forceUseCache = true) => {
           await saveToCache(podcastId, episodes, head.headers)
           console.log('episodes[index]:', episodes[index])
           resolve(episodes[index])
-          segGetEpisodeInfo.close()
+          if (segGetEpisodeInfo) segGetEpisodeInfo.close()
         } catch (e) {
           console.log(e)
         }
