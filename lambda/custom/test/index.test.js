@@ -82,7 +82,7 @@ describe('番号指定でエピソードを再生', () => {
     alexaTest.test([
       {
         request: alexaTest.getIntentRequest('PlayPodcastByIndexIntent', { indexOfEpisodes: 0 }),
-        saysLike: '最近の100エピソードまでしか対応していません',
+        saysLike: 'エピソードの番号は1から500までの数字で指定してください',
         repromptsLike: '何番目のエピソードが聴きたいですか？',
         repromptsNothing: false,
         shouldEndSession: false
@@ -94,7 +94,7 @@ describe('番号指定でエピソードを再生', () => {
     alexaTest.test([
       {
         request: alexaTest.getIntentRequest('PlayPodcastByIndexIntent', { indexOfEpisodes: 0 }),
-        saysLike: '最近の100エピソードまでしか対応していません',
+        saysLike: 'エピソードの番号は1から500までの数字で指定してください',
         repromptsLike: '何番目のエピソードが聴きたいですか？',
         repromptsNothing: false,
         shouldEndSession: false
@@ -164,7 +164,7 @@ describe('ヘルプ', () => {
   alexaTest.test([
     {
       request: alexaTest.getIntentRequest('AMAZON.HelpIntent'),
-      saysLike: 'バックスペースエフエムで配信中の最新から100番目のエピソードを聴くことができます',
+      saysLike: 'バックスペースエフエムで配信中の最新から500番目のエピソードを聴くことができます',
       repromptsLike: '何番目のエピソードが聴きたいですか？',
       shouldEndSession: false,
       hasCardTitle: 'backspace.fm プレイヤーについて'
@@ -255,7 +255,7 @@ describe('次へ', () => {
 
   context('最後のエピソード', () => {
     const request = alexaTest.getIntentRequest('AMAZON.NextIntent')
-    alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:99', 60000, 'PLAYING')
+    alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:499', 60000, 'PLAYING')
 
     alexaTest.test([
       {
