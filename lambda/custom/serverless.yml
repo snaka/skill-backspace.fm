@@ -53,5 +53,6 @@ functions:
           enabled: true
   cacheUpdator:
     handler: cacheUpdator.handler
+    timeout: 60
     events:
-      - schedule: rate(60 minutes)
+      - schedule: rate(10 minutes)
