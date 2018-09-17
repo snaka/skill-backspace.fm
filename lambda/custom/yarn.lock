@@ -64,6 +64,18 @@ alexa-skill-test-framework@^1.2.2:
     i18next "^7.0.0"
     i18next-sprintf-postprocessor "^0.2.2"
 
+"alexa-skill-test-framework@https://github.com/snaka/alexa-skill-test-framework":
+  version "1.2.2"
+  resolved "https://github.com/snaka/alexa-skill-test-framework#0b7faf608b4826f700144f26bc3844e193b51c1e"
+  dependencies:
+    assertion-error "^1.0.2"
+    aws-lambda-mock-context "^3.0.1"
+    aws-sdk-mock "^1.7.0"
+    uuid "^3.0.1"
+  optionalDependencies:
+    i18next "^7.0.0"
+    i18next-sprintf-postprocessor "^0.2.2"
+
 ansi-escapes@^3.0.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/ansi-escapes/-/ansi-escapes-3.1.0.tgz#f73207bb81207d75fd6c83f125af26eea378ca30"
