@@ -20,7 +20,7 @@
     "request": "^2.87.0"
   },
   "devDependencies": {
-    "alexa-skill-test-framework": "^1.2.2",
+    "alexa-skill-test-framework": "https://github.com/snaka/alexa-skill-test-framework",
     "eslint": "^5.2.0",
     "eslint-config-standard": "^11.0.0",
     "eslint-plugin-import": "^2.13.0",

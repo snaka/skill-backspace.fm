@@ -11,7 +11,6 @@ jobs:
     working_directory: ~/repo/lambda/custom
 
     environment:
-      AWS_PROFILE: serverless
       AWS_XRAY_CONTEXT_MISSING: LOG_ERROR
 
     steps:

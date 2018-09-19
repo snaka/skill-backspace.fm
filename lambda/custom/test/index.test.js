@@ -11,6 +11,7 @@ alexaTest.initialize(
 )
 alexaTest.setLocale('ja-JP')
 alexaTest.setDynamoDBTable('alexa-skill-podcasts-player')
+alexaTest.setMockContextOptions({ timeout: 5 })
 
 beforeEach(() => {
   // RSSフィードの読み込みをMockに差し替える

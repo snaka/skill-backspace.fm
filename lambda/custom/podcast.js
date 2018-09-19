@@ -8,7 +8,6 @@ const AWS = awsXRay.captureAWS(require('aws-sdk'))
 AWS.config.update({
   region: process.env.AWS_REGION || 'us-east-1'
 })
-const dynamoDb = new AWS.DynamoDB.DocumentClient()
 
 const targetPodcast = exports.config = {
   FEED_URL: 'http://feeds.backspace.fm/backspacefm',
@@ -46,11 +45,15 @@ async function fetchHead (url) {
   })
 }
 
+function getDynamoDB() {
+  return new AWS.DynamoDB.DocumentClient()
+}
+
 async function saveToCache (podcastId, episodes, headers) {
   const timeStamp = Math.floor((new Date()).getTime() / 1000)
   try {
     console.log(`saveToCache: ${podcastId} => ${targetPodcast.TABLE_NAME}`)
-    await dynamoDb.put({
+    await getDynamoDB().put({
       TableName: targetPodcast.TABLE_NAME,
       Item: { podcastId, episodes, timeStamp, headers }
     }).promise()
@@ -62,7 +65,7 @@ async function saveToCache (podcastId, episodes, headers) {
 async function restoreFromCache (podcastId, etag, forceUseCache = false) {
   try {
     console.log(`restoreFromCache: ${targetPodcast.TABLE_NAME} ${podcastId}`)
-    const restored = await dynamoDb.get({ TableName: targetPodcast.TABLE_NAME, Key: { podcastId } }).promise()
+    const restored = await getDynamoDB.get({ TableName: targetPodcast.TABLE_NAME, Key: { podcastId } }).promise()
     // console.log(`restored: ${JSON.stringify(restored)}`);
     const cachedEtag = (((restored || {}).Item || {}).headers || {}).etag
     if (!forceUseCache && cachedEtag !== etag) {
