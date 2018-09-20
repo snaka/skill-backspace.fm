@@ -26,7 +26,6 @@ beforeEach(() => {
     .replyWithFile(200, path.join(__dirname, '/replies/backspace.fm.xml'), { 'Content-Type': 'text/xml; charset=UTF-8' })
 })
 
-
 describe('スキル起動時', () => {
   alexaTest.test([
     {
@@ -41,7 +40,7 @@ describe('スキル起動時', () => {
         offset: 0
       }
     }
-  ])
+  ], '最新エピソードを再生する')
 })
 
 describe('最新エピソードの再生を指示', () => {
@@ -58,7 +57,7 @@ describe('最新エピソードの再生を指示', () => {
         offset: 0
       }
     }
-  ])
+  ], '最新エピソードを再生する')
 })
 
 describe('番号指定でエピソードを再生', () => {
@@ -76,7 +75,7 @@ describe('番号指定でエピソードを再生', () => {
           offset: 0
         }
       }
-    ])
+    ], '指定された位置のエピソードを再生する')
   })
 
   context('0番目が指定された場合', () => {
@@ -88,7 +87,7 @@ describe('番号指定でエピソードを再生', () => {
         repromptsNothing: false,
         shouldEndSession: false
       }
-    ])
+    ], 'プロンプトを発話して聞き返す')
   })
 
   context('101番目が指定された場合', () => {
@@ -100,7 +99,7 @@ describe('番号指定でエピソードを再生', () => {
         repromptsNothing: false,
         shouldEndSession: false
       }
-    ])
+    ], 'プロンプトを発話して聞き返す')
   })
 })
 
@@ -120,7 +119,7 @@ describe('先頭からを指示', () => {
         offset: 0
       }
     }
-  ])
+  ], '再生位置を先頭から再生する')
 })
 
 describe('早送り', () => {
@@ -139,7 +138,7 @@ describe('早送り', () => {
         offset: 360000
       }
     }
-  ])
+  ], '再生位置を5分進める')
 })
 
 describe('巻き戻し', () => {
@@ -158,7 +157,7 @@ describe('巻き戻し', () => {
         offset: 60000
       }
     }
-  ])
+  ], '再生位置を5分戻す')
 })
 
 describe('ヘルプ', () => {
@@ -170,7 +169,7 @@ describe('ヘルプ', () => {
       shouldEndSession: false,
       hasCardTitle: 'backspace.fm プレイヤーについて'
     }
-  ])
+  ], 'ヘルプを発話する')
 })
 
 describe('キャンセル', () => {
@@ -194,7 +193,7 @@ describe('キャンセル', () => {
             shouldEndSession: true,
             stopStream: true
           }
-        ])
+        ], '何も発話せずに再生を停止する')
       })
 
       context('停止中', () => {
@@ -209,7 +208,7 @@ describe('キャンセル', () => {
             shouldEndSession: true,
             stopStream: true
           }
-        ])
+        ], '「停止します」と発話して再生を停止する')
       })
     })
   })
@@ -231,7 +230,7 @@ describe('レジューム', () => {
         offset: 60000
       }
     }
-  ])
+  ], '一時停止していた場所から再生を再開する')
 })
 
 describe('次へ', () => {
@@ -251,7 +250,7 @@ describe('次へ', () => {
           offset: 0
         }
       }
-    ])
+    ], '次のエピソードを再生する')
   })
 
   context('最後のエピソード', () => {
@@ -265,7 +264,7 @@ describe('次へ', () => {
         shouldEndSession: true,
         playsStoped: true
       }
-    ])
+    ], '「次のエピソードはありません」と発話し再生は停止する')
   })
 })
 
@@ -286,7 +285,7 @@ describe('前へ', () => {
           offset: 0
         }
       }
-    ])
+    ], '前のエピソードを再生する')
   })
 
   context('最初のエピソード', () => {
@@ -301,7 +300,7 @@ describe('前へ', () => {
         shouldEndSession: true,
         playsStoped: true
       }
-    ])
+    ], '「前のエピソードはありません」と発話し再生を停止する')
   })
 })
 
@@ -323,7 +322,7 @@ describe('対応していない操作', () => {
           repromptsNothing: true,
           shouldEndSession: true
         }
-      ])
+      ], '「その操作には対応していません」と発話する')
     })
   })
 })
