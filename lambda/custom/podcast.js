@@ -45,7 +45,7 @@ async function fetchHead (url) {
   })
 }
 
-function getDynamoDB() {
+function getDynamoDB () {
   return new AWS.DynamoDB.DocumentClient()
 }
 
