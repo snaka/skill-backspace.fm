@@ -9,14 +9,11 @@ const translations = {}
 fs.readdirSync('resources').forEach((file) => {
   const isFile = fs.statSync('./resources/' + file).isFile()
   const isJs = /.*\.js$/.test(file)
-  debugger;
   if (!isFile || !isJs) {
-    return;
+    return
   }
   const lang = file.replace('.js', '')
   translations[lang] = require(`./${path.join('resources', file)}`)
 })
-
-debugger;
 
 module.exports = translations
