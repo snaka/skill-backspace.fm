@@ -3,13 +3,10 @@
 'use strict'
 
 const Alexa = require('ask-sdk-core')
-const podcast = require('./podcast')
-
-class InvalidSlotValueError extends Error {}
-
-const skillBuilder = Alexa.SkillBuilders.custom()
 const interceptors = require('./interceptors')
 const handlers = require('./handlers')
+
+const skillBuilder = Alexa.SkillBuilders.custom()
 
 exports.handler = skillBuilder
   .addRequestInterceptors(

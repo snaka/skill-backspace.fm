@@ -1,5 +1,5 @@
 const path = require('path')
-const basePath = path.join(__dirname, 'handlers');
+const basePath = path.join(__dirname, 'handlers')
 
 const exts = {}
 

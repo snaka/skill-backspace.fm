@@ -1,3 +1,5 @@
+class InvalidSlotValueError extends Error {}
+
 module.exports = {
   process (handlerInput) {
     const attributes = handlerInput.attributesManager.getRequestAttributes()
@@ -9,8 +11,7 @@ module.exports = {
         handlerInput.requestEnvelope || {})
         .request || {})
         .intent || {})
-        .slots || {})
-        [slotName] || {}
+        .slots || {})[slotName] || {}
       ).value
       if (slotValue) {
         const parsedInt = parseInt(slotValue)

@@ -1,5 +1,3 @@
-const podcast = require('../podcast')
-
 module.exports = {
   canHandle (handlerInput) {
     const request = handlerInput.requestEnvelope.request

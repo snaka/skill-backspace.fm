@@ -1,5 +1,5 @@
 const path = require('path')
-const basePath = path.join(__dirname, 'interceptors');
+const basePath = path.join(__dirname, 'interceptors')
 
 const exts = {}
 

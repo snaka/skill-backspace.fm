@@ -9,7 +9,7 @@ module.exports = {
     } = handlerInput
     const audioPlayerEventName = requestEnvelope.request.type.split('.')[1]
 
-    let token = getToken(handlerInput)
+    let token = handlerInput.requestEnvelope.request.token
 
     switch (audioPlayerEventName) {
       case 'PlaybackStarted':
