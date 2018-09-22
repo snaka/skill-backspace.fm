@@ -78,6 +78,13 @@ async function restoreFromCache (podcastId, etag, forceUseCache = false) {
   }
 }
 
+exports.createToken = (episodeIndex) => `${this.config.ID}:${episodeIndex}`
+
+exports.parseToken = (token) => {
+  const [, index] = (token || '').split(':')
+  return parseInt(index)
+}
+
 exports.getEpisodeInfo = (podcastId, index, forceUseCache = true) => {
   return new Promise(async (resolve, reject) => {
     awsXRay.captureAsyncFunc('getEpisodeInfo', async (segGetEpisodeInfo) => {
