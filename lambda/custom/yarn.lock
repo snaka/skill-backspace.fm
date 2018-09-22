@@ -52,18 +52,6 @@ ajv@^6.0.1, ajv@^6.5.3:
     json-schema-traverse "^0.4.1"
     uri-js "^4.2.2"
 
-alexa-skill-test-framework@^1.2.2:
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/alexa-skill-test-framework/-/alexa-skill-test-framework-1.2.2.tgz#f89ca60b07845af14354003941ec4b9be749ff0d"
-  dependencies:
-    assertion-error "^1.0.2"
-    aws-lambda-mock-context "^3.0.1"
-    aws-sdk-mock "^1.7.0"
-    uuid "^3.0.1"
-  optionalDependencies:
-    i18next "^7.0.0"
-    i18next-sprintf-postprocessor "^0.2.2"
-
 "alexa-skill-test-framework@https://github.com/snaka/alexa-skill-test-framework":
   version "1.2.2"
   resolved "https://github.com/snaka/alexa-skill-test-framework#0b7faf608b4826f700144f26bc3844e193b51c1e"
