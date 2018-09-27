@@ -20,15 +20,15 @@ podcast.__set__('exports.config', stubConfig)
 const mockDynamoDB = {
   _tableName: '',
   _item: {},
-  put(obj) {
+  put (obj) {
     this._tableName = obj.TableName
     this._item = obj.Item
     return this
   },
-  get() {
+  get () {
     return this
   },
-  promise() {
+  promise () {
     return Promise.resolve()
   }
 }
@@ -37,12 +37,12 @@ podcast.__set__('getDynamoDB', () => mockDynamoDB)
 beforeEach(() => {
   // XRay関連のメソッドがエラーになるのでstub化する
   podcast.__set__('awsXRay', {
-    captureAWS(obj) {
+    captureAWS (obj) {
       return obj
     },
-    captureAsyncFunc(segmentName, yieldFunc) {
+    captureAsyncFunc (segmentName, yieldFunc) {
       const stub = {
-        close() { }
+        close () { }
       }
       yieldFunc(stub)
     }
@@ -120,13 +120,12 @@ describe('podcast module', () => {
 
     it('DynamoDB に episodes と headers がキャッシュされる', async () => {
       await saveToCache('podcastA', [{
-          published_at: '2018-09-28T00:00:00.000Z',
-          title: 'Episode Title #001',
-          url: 'https://example.com/episode-001.mp3'
-        }], {
-          etag: 'abcdefg1234'
-        }
-      )
+        published_at: '2018-09-28T00:00:00.000Z',
+        title: 'Episode Title #001',
+        url: 'https://example.com/episode-001.mp3'
+      }], {
+        etag: 'abcdefg1234'
+      })
 
       expect(mockDynamoDB._tableName).to.equal(stubConfig.TABLE_NAME)
       expect(mockDynamoDB._item).to.deep.include({
