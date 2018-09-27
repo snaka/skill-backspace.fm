@@ -66,13 +66,11 @@ async function restoreFromCache (podcastId, etag, forceUseCache = false) {
   try {
     console.log(`restoreFromCache: ${targetPodcast.TABLE_NAME} ${podcastId}`)
     const restored = await getDynamoDB().get({ TableName: targetPodcast.TABLE_NAME, Key: { podcastId } }).promise()
-    // console.log(`restored: ${JSON.stringify(restored)}`);
     const cachedEtag = (((restored || {}).Item || {}).headers || {}).etag
-    if (!forceUseCache && cachedEtag !== etag) {
-      console.log(`ETag changed cache:${cachedEtag} !== current:${etag}`)
-      return undefined
+    if (forceUseCache || cachedEtag === etag) {
+      return restored.Item.episodes
     }
-    return restored.Item.episodes
+    return undefined
   } catch (e) {
     console.error(e)
   }
