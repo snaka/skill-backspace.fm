@@ -17,6 +17,23 @@ const stubConfig = {
 podcast.__set__('targetPodcast', stubConfig)
 podcast.__set__('exports.config', stubConfig)
 
+const mockDynamoDB = {
+  _tableName: '',
+  _item: {},
+  put(obj) {
+    this._tableName = obj.TableName
+    this._item = obj.Item
+    return this
+  },
+  get() {
+    return this
+  },
+  promise() {
+    return Promise.resolve()
+  }
+}
+podcast.__set__('getDynamoDB', () => mockDynamoDB)
+
 beforeEach(() => {
   // XRay関連のメソッドがエラーになるのでstub化する
   podcast.__set__('awsXRay', {
@@ -94,24 +111,11 @@ describe('podcast module', () => {
   })
 
   describe('saveToCache', () => {
-    const mockDynamoDB = {
-      _tableName: '',
-      _item: {},
-      put(obj) {
-        this._tableName = obj.TableName
-        this._item = obj.Item
-        return this
-      },
-      promise() {
-        return Promise.resolve()
-      }
-    }
     const saveToCache = podcast.__get__('saveToCache')
 
     beforeEach(() => {
       mockDynamoDB._tableName = ''
       mockDynamoDB._item = {}
-      podcast.__set__('getDynamoDB', () => mockDynamoDB)
     })
 
     it('DynamoDB に episodes と headers がキャッシュされる', async () => {
@@ -128,13 +132,59 @@ describe('podcast module', () => {
       expect(mockDynamoDB._item).to.deep.include({
         podcastId: 'podcastA',
         episodes: [{
-            published_at: '2018-09-28T00:00:00.000Z',
-            title: 'Episode Title #001',
-            url: 'https://example.com/episode-001.mp3'
+          published_at: '2018-09-28T00:00:00.000Z',
+          title: 'Episode Title #001',
+          url: 'https://example.com/episode-001.mp3'
         }],
         headers: {
           etag: 'abcdefg1234'
         }
+      })
+    })
+  })
+
+  describe('restoreFromCache', () => {
+    const restoreFromCache = podcast.__get__('restoreFromCache')
+
+    beforeEach(() => {
+      mockDynamoDB._item = {
+        podcastId: 'cachedPodcast',
+        episodes: [{
+          published_at: '2018-09-29T00:00:00.000Z',
+          title: 'Episode Title #002',
+          url: 'https://example.com/episode-002.mp3'
+        }],
+        headers: {
+          etag: 'abcdxyz7890'
+        }
+      }
+      mockDynamoDB.promise = () => Promise.resolve({ Item: mockDynamoDB._item })
+    })
+
+    context('forceUseCache が true の場合', () => {
+      it('キャッシュを返す', async () => {
+        const restored = await restoreFromCache('_podcastId_', '_etag_', true)
+        expect(restored).to.have.deep.members([{
+          published_at: '2018-09-29T00:00:00.000Z',
+          title: 'Episode Title #002',
+          url: 'https://example.com/episode-002.mp3'
+        }])
+      })
+    })
+    context('etag がキャッシュと一致する場合', () => {
+      it('キャッシュを返す', async () => {
+        const restored = await restoreFromCache('_podcastId_', 'abcdxyz7890', false)
+        expect(restored).to.have.deep.members([{
+          published_at: '2018-09-29T00:00:00.000Z',
+          title: 'Episode Title #002',
+          url: 'https://example.com/episode-002.mp3'
+        }])
+      })
+    })
+    context('forceUseCache が false かつ、etag がキャッシュと一致しない場合', () => {
+      it('undefined を返す', async () => {
+        const restored = await restoreFromCache('_podcastId_', 'INVALID', false)
+        expect(restored).to.be.an('undefined')
       })
     })
   })
