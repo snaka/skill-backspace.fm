@@ -187,4 +187,22 @@ describe('podcast module', () => {
       })
     })
   })
+
+  describe('createToken', () => {
+    it('podcast id と index で token を生成する', () => {
+      const token = podcast.createToken(123)
+      expect(token).to.equal('podcast-id:123')
+    })
+  })
+
+  describe('parseToken', () => {
+    it('token文字列を:で分割し右側を整数として返す', () => {
+      const index = podcast.parseToken('hoge:123')
+      expect(index).to.equal(123)
+    })
+    it('tokenが空の場合は0を返す', () => {
+      const index = podcast.parseToken('')
+      expect(index).to.equal(0)
+    })
+  })
 })
