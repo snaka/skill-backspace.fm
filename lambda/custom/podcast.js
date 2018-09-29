@@ -76,11 +76,11 @@ async function restoreFromCache (podcastId, etag, forceUseCache = false) {
   }
 }
 
-exports.createToken = (episodeIndex) => `${this.config.ID}:${episodeIndex}`
+exports.createToken = (episodeIndex) => `${targetPodcast.ID}:${episodeIndex}`
 
 exports.parseToken = (token) => {
-  const [, index] = (token || '').split(':')
-  return parseInt(index)
+  const index = (token || '').split(':')[1]
+  return parseInt(index) || 0
 }
 
 exports.getEpisodeInfo = (podcastId, index, forceUseCache = true) => {
