@@ -1,4 +1,5 @@
 /* eslint-env mocha */
+const path = require('path')
 const chai = require('chai')
 const rewire = require('rewire')
 const nock = require('nock')
@@ -203,6 +204,136 @@ describe('podcast module', () => {
     it('tokenが空の場合は0を返す', () => {
       const index = podcast.parseToken('')
       expect(index).to.equal(0)
+    })
+  })
+
+  describe('getEpisodeInfo', () => {
+    const cache = [
+      {
+        published_at: '2018-09-20T07:00:00.000Z',
+        title: '#010 episode 10',
+        url: 'https://feed.example.com/episodes/ep_010.mp3'
+      },
+      {
+        published_at: '2018-09-15T07:00:00.000Z',
+        title: '#009 episode 9',
+        url: 'https://feed.example.com/episodes/ep_009.mp3'
+      }
+    ]
+    // eslint-disable-next-line no-unused-vars
+    const restoreFromCache = podcast.__set__('restoreFromCache', async () => cache)
+
+    context('podcast id が未設定の場合', () => {
+      it('Errorを投げる')
+    })
+
+    it('戻り値の型がPromiseである', () => {
+      expect(podcast.getEpisodeInfo('podcast id', 1)).to.be.a('Promise')
+    })
+
+    context.only('forceUseCache が true の場合', () => {
+      // it('restoreFromCache を呼び出しキャッシュを読み込む')
+      context('キャッシュが存在する場合', () => {
+        beforeEach(() => {
+          podcast.__set__('restoreFromCache', async () => cache)
+        })
+        it('キャッシュの内容を返す', async () => {
+          const episodeInfo = await podcast.getEpisodeInfo('hoge', 0, true)
+          expect(episodeInfo).to.deep.include({
+            title: '#010 episode 10',
+            url: 'https://feed.example.com/episodes/ep_010.mp3'
+          })
+        })
+      })
+      context('キャッシュが存在しない場合', () => {
+        beforeEach(() => {
+          podcast.__set__('restoreFromCache', async () => null)
+        })
+        // 例外飛ばないので保留
+        context.skip('フィード取得でエラーの場合', () => {
+          beforeEach(() => {
+            nock('http://feed.example.com')
+              .get('/podcast')
+              .replyWithError('error')
+          })
+          it('reject でエラー情報を返却する', async () => {
+            const unsuccessfullFunc = async () => {
+              await podcast.getEpisodeInfo('hoge', 0, true)
+            }
+            expect(unsuccessfullFunc).to.throw(Error)
+          })
+          afterEach(() => {
+            // 非同期のテストが実施される前に実行されてしまう？のでコメントアウト
+            // nock.restore()
+          })
+        })
+        context('フィード取得に成功した場合', () => {
+          context('読み込みの上限に達していない場合', () => {
+            beforeEach(() => {
+              nock('http://feed.example.com')
+                .get('/podcast')
+                .replyWithFile(
+                  200,
+                  path.join(__dirname, '/replies/podcast.test/succeeded_with_few_episodes.xml'),
+                  { 'Content-Type': 'text/xml; charset=UTF-8' }
+                )
+            })
+            it('resolve で指定インデックスのエピソードを返却', async () => {
+              expect(await podcast.getEpisodeInfo('hoge', 0, true)).to.deep.equal({
+                title: 'Danbo-side #032:コンビニから雑誌が消える　その理由はiTunesとメルカリ',
+                url: 'https://tracking.feedpress.it/link/6091/9900270/backspace-d032.mp3',
+                published_at: '2018-08-01T07:00:00.000Z'
+              })
+            })
+          })
+          context('読み込みの上限に達した場合', () => {
+            beforeEach(() => {
+              nock('http://feed.example.com')
+                .get('/podcast')
+                .replyWithFile(
+                  200,
+                  path.join(__dirname, '/replies/podcast.test/succeeded_with_over_max_episodes.xml'),
+                  { 'Content-Type': 'text/xml; charset=UTF-8' }
+                )
+            })
+            it('resolve で指定インデックスのエピソードを返却', async () => {
+              expect(await podcast.getEpisodeInfo('hoge', 0, true)).to.deep.equal({
+                title: 'Danbo-side #032:コンビニから雑誌が消える　その理由はiTunesとメルカリ',
+                url: 'https://tracking.feedpress.it/link/6091/9900270/backspace-d032.mp3',
+                published_at: '2018-08-01T07:00:00.000Z'
+              })
+            })
+          })
+        })
+      })
+    })
+    context('forceUseCache が false の場合', () => {
+      // it('restoreFromCache を呼び出しキャッシュを読み込む')
+      context('キャッシュが存在する場合', () => {
+        context('etagの値が変化している場合', () => {
+          it('podcastのフィードを取得する')
+          context('フィード取得でエラーの場合', () => {
+            it('reject でエラー情報を返却する')
+          })
+          context('フィード取得に成功した場合', () => {
+            context('読み込みの上限に達していない場合', () => {
+              it('resolve でエピソードの一覧を返却')
+            })
+          })
+        })
+        it('キャッシュの内容を返す')
+      })
+      context('キャッシュが存在しない場合', () => {
+        it('podcastのフィードを取得する')
+        context('フィード取得でエラーの場合', () => {
+          it('reject でエラー情報を返却する')
+        })
+        context('フィード取得に成功した場合', () => {
+          context('読み込みの上限に達していない場合', () => {
+            it('resolve でエピソードの一覧を返却')
+          })
+        })
+      })
     })
   })
 })
