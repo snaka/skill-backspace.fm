@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:media="http://search.yahoo.com/mrss/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:feedpress="https://feed.press/xmlns" xmlns:googleplay="http://www.google.com/schemas/play-podcasts/1.0" version="2.0">
+  <channel>
+    <feedpress:locale>jp</feedpress:locale>
+    <feedpress:newsletterId>backspacefm</feedpress:newsletterId>
+    <atom:link rel="hub" href="http://feedpress.superfeedr.com/"/>
+    <media:rating>nonadult</media:rating>
+    <media:description type="plain"/>
+    <media:credit role="author"/>
+    <googleplay:explicit>no</googleplay:explicit>
+    <title>backspace.fm</title>
+    <description>一週間分のテック・ガジェットニュースを配信するポッドキャスト</description>
+    <generator>Jekyll</generator>
+    <link>http://backspace.fm</link>
+    <atom:link href="http://feeds.backspace.fm/backspacefm" rel="self" type="application/rss+xml"/>
+    <media:thumbnail url="http://backspace.fm/images/icon240.png"/>
+    <media:keywords>iPhone,iPad,Android,tech,gadget,technology,camera,tablet,internet,Apple,Google,news,San Francisco,ガジェット</media:keywords>
+    <media:category scheme="http://www.itunes.com/dtds/podcast-1.0.dtd">Technology</media:category>
+    <itunes:author>Koichi Aoki</itunes:author>
+    <itunes:explicit>no</itunes:explicit>
+    <itunes:image href="http://backspace.fm/images/icon1400.jpg"/>
+    <itunes:keywords>iPhone,iPad,Android,tech,gadget,technology,camera,tablet,internet,Apple,Google,news,San Francisco,ガジェット</itunes:keywords>
+    <itunes:subtitle>一週間分のテック・ガジェットニュースを配信するポッドキャスト</itunes:subtitle>
+    <itunes:summary>一週間分のテック・ガジェットニュースを配信するポッドキャスト</itunes:summary>
+    <itunes:category text="Technology">
+      <itunes:category text="Gadgets"/>
+    </itunes:category>
+    <itunes:category text="News &amp; Politics">
+    </itunes:category>
+    <itunes:category text="Arts">
+    </itunes:category>
+    <itunes:category text="Games &amp; Hobbies">
+    </itunes:category>
+    <itunes:owner>
+      <itunes:name>Koichi Aoki</itunes:name>
+      <itunes:email>drikin+backspacefm@gmail.com</itunes:email>
+    </itunes:owner>
+    <language>ja</language>
+    <item>
+      <title>Danbo-side #032:コンビニから雑誌が消える　その理由はiTunesとメルカリ</title>
+      <description>
+          &lt;p&gt;このページをウェブブラウザで見る: &lt;a href="http://backspace.fm/episode/d032/"&gt;リンク&lt;/a&gt;&lt;br&gt;&lt;hr&gt;&lt;/p&gt;
+          &lt;p&gt;最近のコンビニ動向についてダンボさんから目から鱗の話をたくさん伺うことができました。&lt;/p&gt;
+      </description>
+      <itunes:summary>
+          &lt;p&gt;このページをウェブブラウザで見る: &lt;a href="http://backspace.fm/episode/d032/"&gt;リンク&lt;/a&gt;&lt;br&gt;&lt;hr&gt;&lt;/p&gt;
+          &lt;p&gt;最近のコンビニ動向についてダンボさんから目から鱗の話をたくさん伺うことができました。&lt;/p&gt;
+      </itunes:summary>
+      <pubDate>Wed, 01 Aug 2018 00:00:00 -0700</pubDate>
+      <link>http://tracking.feedpress.it/link/6091/9900268</link>
+      <guid isPermaLink="true">http://backspace.fm/episode/d032/</guid>
+      <dc:creator>Koichi Aoki</dc:creator>
+      <itunes:explicit>no</itunes:explicit>
+      <itunes:subtitle>最近のコンビニ動向についてダンボさんから目から鱗の話をたくさん伺うことができました。
+      </itunes:subtitle>
+      <itunes:duration>01:30:14</itunes:duration>
+      <enclosure url="http://tracking.feedpress.it/link/6091/9900270/backspace-d032.mp3" type="audio/mpeg" length="43116744"/>
+    </item>
+    <item>
+      <title>#256:健康は気絶するほど悩ましい</title>
+      <description>
+          &lt;p&gt;このページをウェブブラウザで見る: &lt;a href="http://backspace.fm/episode/256/"&gt;リンク&lt;/a&gt;&lt;br&gt;&lt;hr&gt;&lt;/p&gt;
+          &lt;p&gt;ドリキンとmazzoのB-side的二人回は別のPodcastかと勘違いされるほどのドリキンによるブラウザテックトークから米国医療事情、そして健康ネタへと。&lt;/p&gt;
+      </description>
+      <itunes:summary>
+          このページをウェブブラウザで見る: リンク
+          ドリキンとmazzoのB-side的二人回は別のPodcastかと勘違いされるほどのドリキンによるブラウザテックトークから米国医療事情、そして健康ネタへと。
+      </itunes:summary>
+      <pubDate>Mon, 30 Jul 2018 00:00:00 -0700</pubDate>
+      <link>http://tracking.feedpress.it/link/6091/9882953</link>
+      <guid isPermaLink="true">http://backspace.fm/episode/256/</guid>
+      <dc:creator>Koichi Aoki</dc:creator>
+      <itunes:explicit>no</itunes:explicit>
+      <itunes:subtitle>ドリキンとmazzoのB-side的二人回は別のPodcastかと勘違いされるほどのドリキンによるブラウザテックトークから米国医療事情、そして健康ネタへと。</itunes:subtitle>
+      <itunes:duration>03:16:37</itunes:duration>
+      <enclosure url="http://tracking.feedpress.it/link/6091/9882954/backspace-256.mp3" type="audio/mpeg" length="93941918"/>
+    </item>
+    <item>
+      <title>DUMMY_TITLE1</title>
+      <description>DESCRIPTION</description>
+      <pubDate>Wed, 25 Jul 2018 00:00:00 -0700</pubDate>
+      <link>http://tracking.feedpress.it/link/6091/9852506</link>
+      <guid isPermaLink="true">http://example.com/episode/999/</guid>
+      <dc:creator>Hoge Fuga</dc:creator>
+      <enclosure url="http://audio.example.com/hoge/episode-999.mp3" type="audio/mpeg" length="12345"/>
+    </item>
+    <item>
+      <title>DUMMY_TITLE2</title>
+      <description>DESCRIPTION</description>
+      <pubDate>Wed, 25 Jul 2018 00:00:00 -0700</pubDate>
+      <link>http://tracking.feedpress.it/link/6091/9852506</link>
+      <guid isPermaLink="true">http://example.com/episode/999/</guid>
+      <dc:creator>Hoge Fuga</dc:creator>
+      <enclosure url="http://audio.example.com/hoge/episode-999.mp3" type="audio/mpeg" length="12345"/>
+    </item>
+    <item>
+      <title>DUMMY_TITLE3</title>
+      <description>DESCRIPTION</description>
+      <pubDate>Wed, 25 Jul 2018 00:00:00 -0700</pubDate>
+      <link>http://tracking.feedpress.it/link/6091/9852506</link>
+      <guid isPermaLink="true">http://example.com/episode/999/</guid>
+      <dc:creator>Hoge Fuga</dc:creator>
+      <enclosure url="http://audio.example.com/hoge/episode-999.mp3" type="audio/mpeg" length="12345"/>
+    </item>
+    <item>
+      <title>DUMMY_TITLE4</title>
+      <description>DESCRIPTION</description>
+      <pubDate>Wed, 25 Jul 2018 00:00:00 -0700</pubDate>
+      <link>http://tracking.feedpress.it/link/6091/9852506</link>
+      <guid isPermaLink="true">http://example.com/episode/999/</guid>
+      <dc:creator>Hoge Fuga</dc:creator>
+      <enclosure url="http://audio.example.com/hoge/episode-999.mp3" type="audio/mpeg" length="12345"/>
+    </item>
+    <item>
+      <title>DUMMY_TITLE5</title>
+      <description>DESCRIPTION</description>
+      <pubDate>Wed, 25 Jul 2018 00:00:00 -0700</pubDate>
+      <link>http://tracking.feedpress.it/link/6091/9852506</link>
+      <guid isPermaLink="true">http://example.com/episode/999/</guid>
+      <dc:creator>Hoge Fuga</dc:creator>
+      <enclosure url="http://audio.example.com/hoge/episode-999.mp3" type="audio/mpeg" length="12345"/>
+    </item>
+    <item>
+      <title>DUMMY_TITLE6</title>
+      <description>DESCRIPTION</description>
+      <pubDate>Wed, 25 Jul 2018 00:00:00 -0700</pubDate>
+      <link>http://tracking.feedpress.it/link/6091/9852506</link>
+      <guid isPermaLink="true">http://example.com/episode/999/</guid>
+      <dc:creator>Hoge Fuga</dc:creator>
+      <enclosure url="http://audio.example.com/hoge/episode-999.mp3" type="audio/mpeg" length="12345"/>
+    </item>
+    <item>
+      <title>DUMMY_TITLE7</title>
+      <description>DESCRIPTION</description>
+      <pubDate>Wed, 25 Jul 2018 00:00:00 -0700</pubDate>
+      <link>http://tracking.feedpress.it/link/6091/9852506</link>
+      <guid isPermaLink="true">http://example.com/episode/999/</guid>
+      <dc:creator>Hoge Fuga</dc:creator>
+      <enclosure url="http://audio.example.com/hoge/episode-999.mp3" type="audio/mpeg" length="12345"/>
+    </item>
+    <item>
+      <title>DUMMY_TITLE8</title>
+      <description>DESCRIPTION</description>
+      <pubDate>Wed, 25 Jul 2018 00:00:00 -0700</pubDate>
+      <link>http://tracking.feedpress.it/link/6091/9852506</link>
+      <guid isPermaLink="true">http://example.com/episode/999/</guid>
+      <dc:creator>Hoge Fuga</dc:creator>
+      <enclosure url="http://audio.example.com/hoge/episode-999.mp3" type="audio/mpeg" length="12345"/>
+    </item>
+    <item>
+      <title>DUMMY_TITLE9</title>
+      <description>DESCRIPTION</description>
+      <pubDate>Wed, 25 Jul 2018 00:00:00 -0700</pubDate>
+      <link>http://tracking.feedpress.it/link/6091/9852506</link>
+      <guid isPermaLink="true">http://example.com/episode/999/</guid>
+      <dc:creator>Hoge Fuga</dc:creator>
+      <enclosure url="http://audio.example.com/hoge/episode-999.mp3" type="audio/mpeg" length="12345"/>
+    </item>
+    <item>
+      <title>DUMMY_TITLE10</title>
+      <description>DESCRIPTION</description>
+      <pubDate>Wed, 25 Jul 2018 00:00:00 -0700</pubDate>
+      <link>http://tracking.feedpress.it/link/6091/9852506</link>
+      <guid isPermaLink="true">http://example.com/episode/999/</guid>
+      <dc:creator>Hoge Fuga</dc:creator>
+      <enclosure url="http://audio.example.com/hoge/episode-999.mp3" type="audio/mpeg" length="12345"/>
+    </item>
+  </channel>
+</rss>
