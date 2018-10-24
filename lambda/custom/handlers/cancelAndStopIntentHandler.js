@@ -1,3 +1,5 @@
+const podcast = require('../podcast')
+
 module.exports = {
   canHandle (handlerInput) {
     const request = handlerInput.requestEnvelope.request
@@ -6,13 +8,19 @@ module.exports = {
         request.intent.name === 'AMAZON.StopIntent' ||
         request.intent.name === 'AMAZON.PauseIntent')
   },
-  handle (handlerInput) {
+  async handle (handlerInput) {
     const t = handlerInput.attributesManager.getRequestAttributes().t
 
     const playerActivity = handlerInput.requestEnvelope.context.AudioPlayer.playerActivity
     const token = handlerInput.requestEnvelope.context.AudioPlayer.token
     const offset = handlerInput.requestEnvelope.context.AudioPlayer.offsetInMilliseconds
     const request = handlerInput.requestEnvelope.request
+    const index = podcast.parseToken(token)
+
+    // save offset
+    const attrs = handlerInput.attributesManager.getRequestAttributes()
+    const episode = await podcast.getEpisodeInfo(podcast.config.ID, index)
+    await attrs.setPersistentOffsetByUrl(episode.url, offset)
 
     if (playerActivity === 'PLAYING') {
       return handlerInput.responseBuilder
