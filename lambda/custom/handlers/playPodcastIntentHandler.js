@@ -15,9 +15,14 @@ module.exports = {
     console.log('episode: ', episode)
     const speechText = t('SPEECH_START_PLAYING_EPISODE', podcast.config.NAME_LOCALIZED, episode.title)
 
+    // 前回からの続きを再生
+    const attrs = handlerInput.attributesManager.getRequestAttributes()
+    const offset = await attrs.getPersistentOffsetByUrl(episode.url)
+    console.log('offset from persistent store:', offset)
+
     return handlerInput.responseBuilder
       .speak(speechText)
-      .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, token, 0)
+      .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, token, offset)
       .withSimpleCard(t('CARD_TITLE_START_PLAYING', podcast.config.NAME), speechText)
       .getResponse()
   }
