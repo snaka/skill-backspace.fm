@@ -44,5 +44,10 @@ module.exports = {
       attrs.offsetByUrl[sourceUrl] = offset
       setPersistentAttrs(attrs)
     }
+    attributes.removePersistentOffsetByUrl = async (sourceUrl) => {
+      const attrs = await getPersistentAttrs()
+      delete attrs.offsetByUrl[sourceUrl]
+      setPersistentAttrs(attrs)
+    }
   }
 }
