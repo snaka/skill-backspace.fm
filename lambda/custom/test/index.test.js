@@ -3,6 +3,46 @@ const path = require('path')
 const nock = require('nock')
 const alexaTest = require('alexa-skill-test-framework')
 
+const AWSMOCK = require('aws-sdk-mock')
+AWSMOCK.mock('DynamoDB', 'createTable', (params, callback) => {
+  console.log('MOCK createTable:', params)
+  callback(null, {})
+})
+AWSMOCK.mock('DynamoDB.DocumentClient', 'get', (params, callback) => {
+  console.log('MOCK get:', params)
+  switch(params.TableName) {
+    case 'alexa-skill-podcasts-player-persistent-store':
+      callback(null, {
+        Item: {
+          id: 'hoge',
+          attributes: {
+            offsetByUrl: {
+              'https://example.com/hoge.mp3': 12345
+            }
+          }
+        }
+      })
+      break;
+    case 'alexa-skill-podcasts-player':
+      callback(null, {
+        Item: {
+          podcastId: 'hoge',
+          timeStamp: 1234567,
+          episodes: undefined,
+          headers: {
+            etag: '\"abcdef1234567890\"'
+          }
+        }
+      })
+    default:
+      callback(null, {})
+  }
+})
+AWSMOCK.mock('DynamoDB.DocumentClient', 'put', (params, callback) => {
+  console.log('MOCK put:', params)
+  callback(null, {})
+})
+
 alexaTest.initialize(
   require('../index.js'),
   'amzn1.ask.skill.00000000-0000-0000-0000-000000000000',
@@ -10,7 +50,7 @@ alexaTest.initialize(
   'amzn1.ask.device.LONG_STRING'
 )
 alexaTest.setLocale('ja-JP')
-alexaTest.setDynamoDBTable('alexa-skill-podcasts-player')
+// alexaTest.setDynamoDBTable('alexa-skill-podcasts-player')
 alexaTest.setMockContextOptions({ timeout: 5 })
 
 beforeEach(() => {
@@ -27,9 +67,11 @@ beforeEach(() => {
 })
 
 describe('スキル起動時', () => {
+  const request = alexaTest.getLaunchRequest()
+  alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:0', 0, 'STOPPED')
   alexaTest.test([
     {
-      request: alexaTest.getLaunchRequest(),
+      request,
       saysLike: 'バックスペースエフエム の最新エピソード',
       repromptsNothing: true,
       shouldEndSession: true,
