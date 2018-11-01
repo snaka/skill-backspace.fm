@@ -10,7 +10,7 @@ AWSMOCK.mock('DynamoDB', 'createTable', (params, callback) => {
 })
 AWSMOCK.mock('DynamoDB.DocumentClient', 'get', (params, callback) => {
   console.log('MOCK get:', params)
-  switch(params.TableName) {
+  switch (params.TableName) {
     case 'alexa-skill-podcasts-player-persistent-store':
       callback(null, {
         Item: {
@@ -22,7 +22,7 @@ AWSMOCK.mock('DynamoDB.DocumentClient', 'get', (params, callback) => {
           }
         }
       })
-      break;
+      break
     case 'alexa-skill-podcasts-player':
       callback(null, {
         Item: {
@@ -30,10 +30,11 @@ AWSMOCK.mock('DynamoDB.DocumentClient', 'get', (params, callback) => {
           timeStamp: 1234567,
           episodes: undefined,
           headers: {
-            etag: '\"abcdef1234567890\"'
+            etag: '"abcdef1234567890"'
           }
         }
       })
+      break
     default:
       callback(null, {})
   }

@@ -1,12 +1,12 @@
-module.exports = (function() {
+module.exports = (function () {
   if (process.env.DISABLE_XRAY) {
     const mock = {
-      captureAWS(obj) {
+      captureAWS (obj) {
         return obj
       },
-      captureAsyncFunc(segmentName, asyncFunc) {
+      captureAsyncFunc (segmentName, asyncFunc) {
         const mockSubSegment = {
-          close() { /* do nothing */ }
+          close () { /* do nothing */ }
         }
         asyncFunc(mockSubSegment)
       }
