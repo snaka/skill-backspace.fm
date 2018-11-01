@@ -37,7 +37,7 @@ module.exports = {
     }
     attributes.getPersistentOffsetByUrl = async (sourceUrl) => {
       const attrs = await getPersistentAttrs()
-      return attrs.offsetByUrl[sourceUrl] - 0
+      return parseInt(attrs.offsetByUrl[sourceUrl]) || 0
     }
     attributes.setPersistentOffsetByUrl = async (sourceUrl, offset) => {
       const attrs = await getPersistentAttrs()
