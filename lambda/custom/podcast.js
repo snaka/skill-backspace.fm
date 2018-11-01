@@ -2,7 +2,7 @@
 
 const request = require('request')
 const FeedParser = require('feedparser')
-const awsXRay = require('aws-xray-sdk')
+const awsXRay = require('./my-xray')
 const AWS = awsXRay.captureAWS(require('aws-sdk'))
 
 AWS.config.update({
