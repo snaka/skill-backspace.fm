@@ -12,6 +12,7 @@ jobs:
 
     environment:
       AWS_XRAY_CONTEXT_MISSING: LOG_ERROR
+      DISABLE_XRAY: true
 
     steps:
       - checkout:

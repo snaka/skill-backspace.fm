@@ -23,5 +23,31 @@ module.exports = {
         return 0
       }
     }
+    const getPersistentAttrs = async () => {
+      let attrs = await handlerInput.attributesManager.getPersistentAttributes()
+      if (Object.keys(attrs).length === 0) {
+        attrs = {
+          offsetByUrl: {}
+        }
+      }
+      return attrs
+    }
+    const setPersistentAttrs = (attrs) => {
+      handlerInput.attributesManager.setPersistentAttributes(attrs)
+    }
+    attributes.getPersistentOffsetByUrl = async (sourceUrl) => {
+      const attrs = await getPersistentAttrs()
+      return parseInt(attrs.offsetByUrl[sourceUrl]) || 0
+    }
+    attributes.setPersistentOffsetByUrl = async (sourceUrl, offset) => {
+      const attrs = await getPersistentAttrs()
+      attrs.offsetByUrl[sourceUrl] = offset
+      setPersistentAttrs(attrs)
+    }
+    attributes.removePersistentOffsetByUrl = async (sourceUrl) => {
+      const attrs = await getPersistentAttrs()
+      delete attrs.offsetByUrl[sourceUrl]
+      setPersistentAttrs(attrs)
+    }
   }
 }

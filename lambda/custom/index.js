@@ -3,19 +3,26 @@
 'use strict'
 
 const Alexa = require('ask-sdk-core')
+const Adapter = require('ask-sdk-dynamodb-persistence-adapter')
 const interceptors = require('./interceptors')
 const handlers = require('./handlers')
 
+const DynamoDBAdapter = new Adapter.DynamoDbPersistenceAdapter({
+  tableName: 'alexa-skill-podcasts-player-persistent-store',
+  createTable: true
+})
 const skillBuilder = Alexa.SkillBuilders.custom()
 
 exports.handler = skillBuilder
+  .withPersistenceAdapter(DynamoDBAdapter)
   .addRequestInterceptors(
     interceptors.localizationInterceptor,
     interceptors.requestLoggingInterceptor,
     interceptors.defineUtilityInterceptor
   )
   .addResponseInterceptors(
-    interceptors.responseLoggingInterceptor
+    interceptors.responseLoggingInterceptor,
+    interceptors.savePersistentAttributesInterceptor
   )
   .addRequestHandlers(
     handlers.warmUpHandler,

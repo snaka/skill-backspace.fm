@@ -14,10 +14,12 @@ provider:
   iamRoleStatements:
     - Effect: "Allow"
       Action:
+        - "dynamodb:CreateTable"
+        - "dynamodb:DeleteTable"
         - "dynamodb:PutItem"
         - "dynamodb:DeleteItem"
         - "dynamodb:GetItem"
-      Resource: "*"
+      Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/*"
     - Effect: "Allow"
       Action:
         - "lambda:InvokeFunction"
