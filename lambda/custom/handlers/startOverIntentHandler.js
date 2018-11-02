@@ -1,4 +1,4 @@
-const podcast = require('../podcast')
+const PodcastPlayer = require('../podcast-player')
 
 module.exports = {
   canHandle (handlerInput) {
@@ -8,16 +8,12 @@ module.exports = {
   },
   async handle (handlerInput) {
     const t = handlerInput.attributesManager.getRequestAttributes().t
+    const podcast = new PodcastPlayer(handlerInput)
 
-    const token = handlerInput.requestEnvelope.context.AudioPlayer.token
-    const index = podcast.parseToken(token)
-    const episode = await podcast.getEpisodeInfo(podcast.config.ID, index)
+    await podcast.startOver()
 
-    console.log(`START OVER: token ${token}`)
-
-    return handlerInput.responseBuilder
+    return podcast.response
       .speak(t('SPEECH_START_OVER'))
-      .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, token, 0)
       .getResponse()
   }
 }

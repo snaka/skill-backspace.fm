@@ -10,30 +10,25 @@ module.exports = {
       responseBuilder
     } = handlerInput
     const audioPlayerEventName = requestEnvelope.request.type.split('.')[1]
-
-    const token = handlerInput.requestEnvelope.request.token
-    const index = podcast.parseToken(token)
-    const episode = await podcast.getEpisodeInfo(podcast.config.ID, index)
-    const offset = handlerInput.requestEnvelope.context.AudioPlayer.offsetInMilliseconds
-    const attrs = handlerInput.attributesManager.getRequestAttributes()
+    const podcast = new PodcastPlayer(handlerInput)
 
     switch (audioPlayerEventName) {
       case 'PlaybackStarted':
-        console.log(`PlaybackStarted: ${token}`)
+        console.log(`PlaybackStarted: ${podcast.nowPlayingToken}`)
         break
       case 'PlaybackFinished':
-        console.log(`PlaybackFinished: ${token}`)
-        await attrs.removePersistentOffsetByUrl(episode.url)
+        console.log(`PlaybackFinished: ${podcast.nowPlayingToken}`)
+        await podcast.resetOffset()
         break
       case 'PlaybackStopped':
-        console.log(`PlaybackStopped: ${token}`)
-        await attrs.setPersistentOffsetByUrl(episode.url, offset)
+        console.log(`PlaybackStopped: ${podcast.nowPlayingToken}`)
+        await podcast.stop()
         break
       case 'PlaybackNearlyFinished':
-        console.log(`PlaybackNearlyFinished: ${token}`)
+        console.log(`PlaybackNearlyFinished: ${podcast.nowPlayingToken}`)
         break
       case 'PlaybackFailed':
-        console.log(`PlaybackFailed: ${token}`)
+        console.log(`PlaybackFailed: ${podcast.nowPlayingToken}`)
         break
       default:
         throw new Error(`Not implemented yet : ${audioPlayerEventName}`)

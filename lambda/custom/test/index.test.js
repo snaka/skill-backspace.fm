@@ -73,7 +73,7 @@ describe('スキル起動時', () => {
   alexaTest.test([
     {
       request,
-      saysLike: 'バックスペースエフエム の最新エピソード',
+      saysLike: 'バックスペースエフエム の最新エピソード「Danbo-side #032:コンビニから雑誌が消える　その理由はiTunesとメルカリ」を再生します',
       repromptsNothing: true,
       shouldEndSession: true,
       playsStream: {
@@ -90,7 +90,7 @@ describe('最新エピソードの再生を指示', () => {
   alexaTest.test([
     {
       request: alexaTest.getIntentRequest('PlayPodcastIntent'),
-      saysLike: 'バックスペースエフエム の最新エピソード',
+      saysLike: 'バックスペースエフエム の最新エピソード「Danbo-side #032:コンビニから雑誌が消える　その理由はiTunesとメルカリ」を再生します',
       repromptsNothing: true,
       shouldEndSession: true,
       playsStream: {
@@ -108,7 +108,7 @@ describe('番号指定でエピソードを再生', () => {
     alexaTest.test([
       {
         request: alexaTest.getIntentRequest('PlayPodcastByIndexIntent', { indexOfEpisodes: 3 }),
-        saysLike: 'バックスペースエフエム の 3 番目のエピソード',
+        saysLike: 'バックスペースエフエム の 3 番目のエピソード「#255:アルファ散財フルサイズ」を再生します',
         repromptsNothing: true,
         shouldEndSession: true,
         playsStream: {

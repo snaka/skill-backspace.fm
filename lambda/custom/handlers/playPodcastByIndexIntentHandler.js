@@ -1,4 +1,4 @@
-const podcast = require('../podcast')
+const PodcastPlayer = require('../podcast-player')
 
 module.exports = {
   canHandle (handlerInput) {
@@ -10,11 +10,11 @@ module.exports = {
     const attrs = handlerInput.attributesManager.getRequestAttributes()
     const t = attrs.t
 
-    let index
+    let position
     try {
-      index = attrs.getSlotValueAsInt('indexOfEpisodes')
+      position = attrs.getSlotValueAsInt('indexOfEpisodes')
     } catch (e) {
-      const speechText = t('SPEECH_INVALID_EPISODE_INDEX', podcast.config.MAX_EPISODE_COUNT)
+      const speechText = t('SPEECH_INVALID_EPISODE_INDEX', podcast.maxEpisodeCount)
       const repromptText = t('PROMPT_INDEX_NUMBER')
       return handlerInput.responseBuilder
         .speak(speechText)
@@ -23,9 +23,11 @@ module.exports = {
         .getResponse()
     }
 
-    if (index < 1 || index > podcast.config.MAX_EPISODE_COUNT) {
-      console.log('INVALID INDEX:', index)
-      const speechText = t('SPEECH_INVALID_EPISODE_INDEX', podcast.config.MAX_EPISODE_COUNT)
+    const podcast = new PodcastPlayer(handlerInput)
+
+    const index = position - 1
+    if (!PodcastPlayer.isValidIndex(index)) {
+      const speechText = t('SPEECH_INVALID_EPISODE_INDEX', podcast.maxEpisodeCount)
       const repromptText = t('PROMPT_INDEX_NUMBER')
       return handlerInput.responseBuilder
         .speak(speechText)
@@ -33,15 +35,15 @@ module.exports = {
         .withSimpleCard(t('CARD_TITLE_INVALID_EPISODE'), speechText)
         .getResponse()
     }
-    const episode = await podcast.getEpisodeInfo(podcast.config.ID, index - 1)
-    const token = podcast.createToken(index - 1)
-    const speechText = t('SPEECH_START_PLAYING_EPISODE_AT', podcast.config.NAME_LOCALIZED, index, episode.title)
-    const cardText = t('SPEECH_START_PLAYING_EPISODE_AT', podcast.config.NAME, index, episode.title)
 
-    return handlerInput.responseBuilder
+    await podcast.play(index)
+
+    const speechText = t('SPEECH_START_PLAYING_EPISODE_AT', podcast.localizedName, position, podcast.nowPlayingTitle)
+    const cardText = t('SPEECH_START_PLAYING_EPISODE_AT', podcast.name, position, podcast.nowPlayingTitle)
+
+    return podcast.response
       .speak(speechText)
-      .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, token, 0)
-      .withSimpleCard(t('CARD_TITLE_PLAYING_EPISODE_AT', podcast.config.NAME, index), cardText)
+      .withSimpleCard(t('CARD_TITLE_PLAYING_EPISODE_AT', podcast.name, position), cardText)
       .getResponse()
   }
 }

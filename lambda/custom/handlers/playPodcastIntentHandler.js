@@ -1,4 +1,4 @@
-const podcast = require('../podcast')
+const PodcastPlayer = require('../podcast-player')
 
 module.exports = {
   canHandle (handlerInput) {
@@ -7,23 +7,15 @@ module.exports = {
         handlerInput.requestEnvelope.request.intent.name === 'PlayPodcastIntent')
   },
   async handle (handlerInput) {
-    const attrs = handlerInput.attributesManager.getRequestAttributes()
-    const t = attrs.t
-    console.log('PLAY PODCAST')
+    const t = handlerInput.attributesManager.getRequestAttributes().t
+    const podcast = new PodcastPlayer(handlerInput)
+    await podcast.play()
 
-    const token = podcast.createToken(0)
-    const episode = await podcast.getEpisodeInfo(podcast.config.ID, 0)
-    console.log('episode: ', episode)
-    const speechText = t('SPEECH_START_PLAYING_EPISODE', podcast.config.NAME_LOCALIZED, episode.title)
+    const speechText = t('SPEECH_START_PLAYING_EPISODE', podcast.localizedName, podcast.nowPlayingTitle)
 
-    // 前回からの続きを再生
-    const offset = await attrs.getPersistentOffsetByUrl(episode.url)
-    console.log('offset from persistent store:', offset)
-
-    return handlerInput.responseBuilder
+    return podcast.response
       .speak(speechText)
-      .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, token, offset)
-      .withSimpleCard(t('CARD_TITLE_START_PLAYING', podcast.config.NAME), speechText)
+      .withSimpleCard(t('CARD_TITLE_START_PLAYING', podcast.name), speechText)
       .getResponse()
   }
 }
