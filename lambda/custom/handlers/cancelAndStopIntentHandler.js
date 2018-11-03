@@ -1,4 +1,4 @@
-const podcast = require('../podcast')
+const PodcastPlayer = require('../podcast-player')
 
 module.exports = {
   canHandle (handlerInput) {
@@ -10,38 +10,16 @@ module.exports = {
   },
   async handle (handlerInput) {
     const t = handlerInput.attributesManager.getRequestAttributes().t
+    const podcast = new PodcastPlayer(handlerInput)
 
-    const playerActivity = handlerInput.requestEnvelope.context.AudioPlayer.playerActivity
-    const token = handlerInput.requestEnvelope.context.AudioPlayer.token
-    const offset = handlerInput.requestEnvelope.context.AudioPlayer.offsetInMilliseconds
-    const request = handlerInput.requestEnvelope.request
-    const index = podcast.parseToken(token)
+    await podcast.stop()
 
-    // save offset
-    const attrs = handlerInput.attributesManager.getRequestAttributes()
-    const episode = await podcast.getEpisodeInfo(podcast.config.ID, index)
-    await attrs.setPersistentOffsetByUrl(episode.url, offset)
-
-    if (playerActivity === 'PLAYING') {
-      return handlerInput.responseBuilder
-        .addAudioPlayerStopDirective()
-        .getResponse()
+    if (podcast.isPlaying) {
+      return podcast.response.getResponse()
     }
 
-    let speechText
-    switch (request.intent.name) {
-      case 'AMAZON.CancelIntent':
-      case 'AMAZON.StopIntent':
-      case 'AMAZON.PauseIntent':
-        speechText = t('SPEECH_STOP')
-        break
-    }
-
-    console.log(`STOP: token ${token} offset ${offset} intent ${request.intent.name}`)
-
-    return handlerInput.responseBuilder
-      .speak(speechText)
-      .addAudioPlayerStopDirective()
+    return podcast.response
+      .speak(t('SPEECH_STOP'))
       .getResponse()
   }
 }

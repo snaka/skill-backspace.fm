@@ -1,4 +1,4 @@
-const podcast = require('../podcast')
+const PodcastPlayer = require('../podcast-player')
 
 module.exports = {
   canHandle (handlerInput) {
@@ -9,26 +9,22 @@ module.exports = {
   },
   async handle (handlerInput) {
     const t = handlerInput.attributesManager.getRequestAttributes().t
-    const token = handlerInput.requestEnvelope.context.AudioPlayer.token
-    const index = podcast.parseToken(token)
+    const podcast = new PodcastPlayer(handlerInput)
 
-    const nextIndex = index + 1
-    if (nextIndex >= podcast.config.MAX_EPISODE_COUNT) {
+    const nextIndex = podcast.nowPlayingIndex + 1
+    if (!PodcastPlayer.isValidIndex(nextIndex)) {
       return handlerInput.responseBuilder
         .speak(t('SPEECH_NEXT_EPISODE_NOT_EXIST'))
         .getResponse()
     }
 
-    const nextToken = podcast.createToken(nextIndex)
-    const episode = await podcast.getEpisodeInfo(podcast.config.ID, nextIndex)
-    console.log('NEXT ', nextToken, episode)
+    await podcast.play(nextIndex)
 
-    const speechText = t('SPEECH_EPISODE_AT_X_WILL_START', nextIndex + 1, episode.title)
+    const speechText = t('SPEECH_EPISODE_AT_X_WILL_START', nextIndex + 1, podcast.nowPlayingTitle)
 
-    return handlerInput.responseBuilder
+    return podcast.response
       .speak(speechText)
-      .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, nextToken, 0)
-      .withSimpleCard(t('CARD_TITLE_EPISODE_AT_X', podcast.config.NAME, nextIndex + 1), speechText)
+      .withSimpleCard(t('CARD_TITLE_EPISODE_AT_X', podcast.name, nextIndex + 1), speechText)
       .getResponse()
   }
 }

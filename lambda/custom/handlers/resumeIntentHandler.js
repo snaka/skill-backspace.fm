@@ -1,4 +1,4 @@
-const podcast = require('../podcast')
+const PodcastPlayer = require('../podcast-player')
 
 module.exports = {
   canHandle (handlerInput) {
@@ -7,13 +7,8 @@ module.exports = {
       request.intent.name === 'AMAZON.ResumeIntent'
   },
   async handle (handlerInput) {
-    const token = handlerInput.requestEnvelope.context.AudioPlayer.token
-    const offset = handlerInput.requestEnvelope.context.AudioPlayer.offsetInMilliseconds
-    const index = podcast.parseToken(token)
-    const episode = await podcast.getEpisodeInfo(podcast.config.ID, index)
-
-    return handlerInput.responseBuilder
-      .addAudioPlayerPlayDirective('REPLACE_ALL', episode.url, token, offset)
-      .getResponse()
+    const podcast = new PodcastPlayer(handlerInput)
+    await podcast.resume()
+    return podcast.response.getResponse()
   }
 }
