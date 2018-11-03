@@ -13,6 +13,7 @@ jobs:
     environment:
       AWS_XRAY_CONTEXT_MISSING: LOG_ERROR
       DISABLE_XRAY: true
+      PERSISTENT_STORE_TABLE: persistent-store-test
 
     steps:
       - checkout:

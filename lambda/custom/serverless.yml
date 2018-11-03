@@ -53,6 +53,8 @@ functions:
       - alexaSkill:
           appId: ${env:SKILL_ID}
           enabled: true
+    environment:
+      PERSISTENT_STORE_TABLE: alexa-skill-podcasts-player-persistent-store-${opt:stage, self:provider.stage}
   cacheUpdator:
     handler: cacheUpdator.handler
     timeout: 60
