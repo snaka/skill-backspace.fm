@@ -27,7 +27,7 @@ module.exports = class PodcastPlayer {
     this.token = podcast.createToken(index)
     this.episode = await podcast.getEpisodeInfo(podcast.config.ID, index)
     console.log('play offset:', offset)
-    if (offset) {
+    if (typeof offset !== 'undefined') {
       this.offset = offset
     } else {
       this.offset = await this.attrs().getPersistentOffsetByUrl(this.episode.url)
