@@ -1,8 +1,8 @@
 const podcast = require('./podcast')
 
 module.exports = class PodcastPlayer {
-  static isValidIndex(index) {
-    return 0 <= index && index < podcast.config.MAX_EPISODE_COUNT
+  static isValidIndex (index) {
+    return index >= 0 && index < podcast.config.MAX_EPISODE_COUNT
   }
   constructor (handlerInput) {
     this.handlerInput = handlerInput
@@ -42,14 +42,14 @@ module.exports = class PodcastPlayer {
   }
   async resetOffset () {
     const nowPlaying = await podcast.getEpisodeInfo(podcast.config.ID, this.nowPlayingIndex)
-    await attrs().removePersistentOffsetByUrl(nowPlaying.url)
+    await this.attrs().removePersistentOffsetByUrl(nowPlaying.url)
   }
   async fastForward (minutes) {
     const newOffset = this.nowPlayingOffset + minutes * 60000
     await this.play(this.nowPlayingIndex, newOffset)
   }
   async rewind (minutes) {
-    const newOffset = this.nowPlayingOffset - minutes * 60000
+    let newOffset = this.nowPlayingOffset - minutes * 60000
     if (newOffset < 0) newOffset = 0
     await this.play(this.nowPlayingIndex, newOffset)
   }

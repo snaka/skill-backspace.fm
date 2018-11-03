@@ -1,4 +1,4 @@
-const podcast = require('../podcast')
+const PodcastPlayer = require('../podcast-player')
 
 module.exports = {
   canHandle (handlerInput) {

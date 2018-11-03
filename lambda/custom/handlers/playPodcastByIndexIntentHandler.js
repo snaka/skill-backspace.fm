@@ -9,6 +9,7 @@ module.exports = {
     console.log('PLAY PODCAST WITH EPISODE NO.')
     const attrs = handlerInput.attributesManager.getRequestAttributes()
     const t = attrs.t
+    const podcast = new PodcastPlayer(handlerInput)
 
     let position
     try {
@@ -22,8 +23,6 @@ module.exports = {
         .withSimpleCard(t('CARD_TITLE_INVALID_EPISODE'), speechText)
         .getResponse()
     }
-
-    const podcast = new PodcastPlayer(handlerInput)
 
     const index = position - 1
     if (!PodcastPlayer.isValidIndex(index)) {
