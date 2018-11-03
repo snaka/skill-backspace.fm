@@ -11,7 +11,7 @@ AWSMOCK.mock('DynamoDB', 'createTable', (params, callback) => {
 AWSMOCK.mock('DynamoDB.DocumentClient', 'get', (params, callback) => {
   console.log('MOCK get:', params)
   switch (params.TableName) {
-    case 'alexa-skill-podcasts-player-persistent-store':
+    case 'persistent-store-test':
       callback(null, {
         Item: {
           id: 'hoge',

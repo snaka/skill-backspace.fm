@@ -8,7 +8,7 @@ const interceptors = require('./interceptors')
 const handlers = require('./handlers')
 
 const DynamoDBAdapter = new Adapter.DynamoDbPersistenceAdapter({
-  tableName: 'alexa-skill-podcasts-player-persistent-store',
+  tableName: process.env.PERSISTENT_STORE_TABLE,
   createTable: true
 })
 const skillBuilder = Alexa.SkillBuilders.custom()

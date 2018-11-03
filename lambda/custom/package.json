@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "DISABLE_XRAY=true mocha",
+    "test": "DISABLE_XRAY=true PERSISTENT_STORE_TABLE=persistent-store-test mocha",
     "lint": "eslint . --fix"
   },
   "author": "",
