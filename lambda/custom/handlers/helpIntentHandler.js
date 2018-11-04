@@ -11,13 +11,13 @@ module.exports = {
   handle (handlerInput) {
     const t = handlerInput.attributesManager.getRequestAttributes().t
 
-    const speechText = t('SPEECH_HELP', podcast.config.MAX_EPISODE_COUNT)
+    const speechText = t('SPEECH_HELP', podcast.config.SKILL_NAME_LOCALIZED, podcast.config.NAME_LOCALIZED, podcast.config.MAX_EPISODE_COUNT)
     const repromptText = t('PROMPT_INDEX_NUMBER')
 
     return handlerInput.responseBuilder
       .speak(speechText)
       .reprompt(repromptText)
-      .withSimpleCard(t('CARD_TITLE_ABOUT_SKILL'), speechText)
+      .withSimpleCard(t('CARD_TITLE_ABOUT_SKILL', podcast.config.SKILL_NAME), speechText)
       .getResponse()
   }
 }
