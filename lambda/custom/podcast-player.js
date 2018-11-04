@@ -1,4 +1,5 @@
 const podcast = require('./podcast')
+Object.assign(podcast.config, require('./constants'))
 
 module.exports = class PodcastPlayer {
   static isValidIndex (index) {
