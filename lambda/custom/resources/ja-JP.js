@@ -9,7 +9,7 @@ module.exports = {
     SPEECH_PLAYER_STATE_IS_NOT_PLAYING: 'その操作はエピソードを再生中の場合のみ可能です',
     SPEECH_FASTFORWARD_X_MIN: '%d分進めます',
     SPEECH_REWIND_X_MIN: '%d分戻ります',
-    SPEECH_HELP: 'バックスペースエフエムプレイヤーではバックスペースエフエムで配信中の最新から%d番目のエピソードを聴くことができます。何番目のエピソードが聴きたいですか？',
+    SPEECH_HELP: '%sでは%sで配信中の最新から%d番目のエピソードを聴くことができます。何番目のエピソードが聴きたいですか？',
     SPEECH_STOP: '停止します',
     SPEECH_NEXT_EPISODE_NOT_EXIST: '次のエピソードはありません',
     SPEECH_PREV_EPISODE_NOT_EXIST: '前のエピソードはありません',
@@ -22,7 +22,7 @@ module.exports = {
     PROMPT_REWIND_MINUTES: '何分戻しますか？',
     CARD_TITLE_INVALID_EPISODE: '対応していないエピソード',
     CARD_TITLE_PLAYING_EPISODE_AT: '%s の %d 番目のエピソード',
-    CARD_TITLE_ABOUT_SKILL: 'backspace.fm プレイヤーについて',
+    CARD_TITLE_ABOUT_SKILL: '%sについて',
     CARD_TITLE_EPISODE_AT_X: '%s の %d 番目のエピソード'
   }
 }

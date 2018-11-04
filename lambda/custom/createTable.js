@@ -1,6 +1,6 @@
 'use strict'
 
-const podcast = require('./podcast.js')
+const podcast = require('podcast')
 const AWS = require('aws-sdk')
 
 AWS.config.update({

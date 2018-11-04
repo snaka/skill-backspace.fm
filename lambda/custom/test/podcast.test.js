@@ -4,7 +4,8 @@ const rewire = require('rewire')
 const nock = require('nock')
 
 const expect = chai.expect
-const podcast = rewire('../podcast.js')
+const podcast = rewire('../podcast')
+Object.assign(podcast.config, require('../constants'))
 
 const stubConfig = {
   FEED_URL: 'http://feed.example.com/podcast',

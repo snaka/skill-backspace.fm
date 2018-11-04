@@ -9,14 +9,7 @@ AWS.config.update({
   region: process.env.AWS_REGION || 'us-east-1'
 })
 
-const targetPodcast = exports.config = {
-  FEED_URL: 'http://feeds.backspace.fm/backspacefm',
-  TABLE_NAME: 'alexa-skill-podcasts-player',
-  ID: 'backspace.fm',
-  NAME: 'backspace.fm',
-  NAME_LOCALIZED: 'バックスペースエフエム',
-  MAX_EPISODE_COUNT: 500
-}
+const targetPodcast = exports.config = {}
 
 function pickSslMediaUrl (enclosures) {
   const sslMedia = enclosures.find(item => item.url.startsWith('https'))
