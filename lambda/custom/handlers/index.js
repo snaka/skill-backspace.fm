@@ -1,5 +1,4 @@
 const path = require('path')
-const basePath = __dirname
 
 const exts = {}
 
