@@ -1,6 +1,9 @@
-const PodcastPlayer = require('../podcast-player')
+let PodcastPlayer
 
 module.exports = {
+  set PodcastPlayer (clazz) {
+    PodcastPlayer = clazz
+  },
   canHandle (handlerInput) {
     return handlerInput.requestEnvelope.request.type.startsWith('AudioPlayer.')
   },

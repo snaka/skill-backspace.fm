@@ -6,6 +6,12 @@ const Alexa = require('ask-sdk-core')
 const Adapter = require('ask-sdk-dynamodb-persistence-adapter')
 const interceptors = require('./interceptors')
 const handlers = require('./handlers')
+const PodcastPlayer = require('./podcast-player')
+
+PodcastPlayer.podcastConfig = require('./constants')
+for (let name in handlers) {
+  handlers[name].PodcastPlayer = PodcastPlayer
+}
 
 const DynamoDBAdapter = new Adapter.DynamoDbPersistenceAdapter({
   tableName: process.env.PERSISTENT_STORE_TABLE,

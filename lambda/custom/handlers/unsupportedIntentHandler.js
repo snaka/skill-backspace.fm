@@ -1,4 +1,5 @@
 module.exports = {
+  set PodcastPlayer (_) { /* do nothing */ },
   canHandle (handlerInput) {
     const request = handlerInput.requestEnvelope.request
 
