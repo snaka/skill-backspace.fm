@@ -1,7 +1,12 @@
-const podcast = require('../podcast')
-Object.assign(podcast.config, require('../constants'))
+let podcastConfig
 
 module.exports = {
+  set PodcastPlayer (clazz) {
+    podcastConfig = clazz.podcastConfig
+  },
+  get PodcastPlayer () {
+    throw new Error('not supported operation.')
+  },
   canHandle (handlerInput) {
     const request = handlerInput.requestEnvelope.request
 
@@ -11,13 +16,18 @@ module.exports = {
   handle (handlerInput) {
     const t = handlerInput.attributesManager.getRequestAttributes().t
 
-    const speechText = t('SPEECH_HELP', podcast.config.SKILL_NAME_LOCALIZED, podcast.config.NAME_LOCALIZED, podcast.config.MAX_EPISODE_COUNT)
+    const speechText = t(
+      'SPEECH_HELP',
+      podcastConfig.SKILL_NAME_LOCALIZED,
+      podcastConfig.NAME_LOCALIZED,
+      podcastConfig.MAX_EPISODE_COUNT
+    )
     const repromptText = t('PROMPT_INDEX_NUMBER')
 
     return handlerInput.responseBuilder
       .speak(speechText)
       .reprompt(repromptText)
-      .withSimpleCard(t('CARD_TITLE_ABOUT_SKILL', podcast.config.SKILL_NAME), speechText)
+      .withSimpleCard(t('CARD_TITLE_ABOUT_SKILL', podcastConfig.SKILL_NAME), speechText)
       .getResponse()
   }
 }

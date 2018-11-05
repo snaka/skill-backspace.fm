@@ -1,7 +1,15 @@
+'use strict'
+
 const podcast = require('./podcast')
-Object.assign(podcast.config, require('./constants'))
 
 module.exports = class PodcastPlayer {
+  static set podcastConfig (config) {
+    Object.assign(podcast.config, config)
+    Object.freeze(podcast.config)
+  }
+  static get podcastConfig () {
+    return Object.assign({}, podcast.config)
+  }
   static isValidIndex (index) {
     return index >= 0 && index < podcast.config.MAX_EPISODE_COUNT
   }

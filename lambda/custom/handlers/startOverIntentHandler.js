@@ -1,6 +1,12 @@
-const PodcastPlayer = require('../podcast-player')
+let PodcastPlayer
 
 module.exports = {
+  set PodcastPlayer (clazz) {
+    PodcastPlayer = clazz
+  },
+  get PodcastPlayer () {
+    return PodcastPlayer
+  },
   canHandle (handlerInput) {
     const request = handlerInput.requestEnvelope.request
     return request.type === 'IntentRequest' &&
