@@ -1,5 +1,4 @@
 module.exports = {
-  set PodcastPlayer (_) { /* do nothing */ },
   canHandle () {
     return true
   },

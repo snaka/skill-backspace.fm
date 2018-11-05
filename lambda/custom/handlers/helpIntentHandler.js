@@ -4,6 +4,9 @@ module.exports = {
   set PodcastPlayer (clazz) {
     podcastConfig = clazz.podcastConfig
   },
+  get PodcastPlayer () {
+    throw new Error('not supported operation.')
+  },
   canHandle (handlerInput) {
     const request = handlerInput.requestEnvelope.request
 

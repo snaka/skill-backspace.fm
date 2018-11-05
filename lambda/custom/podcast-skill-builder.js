@@ -4,13 +4,15 @@ const handlers = require('./handlers')
 const PodcastPlayer = require('./podcast-player')
 
 module.exports = class PodcastSkillBuilder {
-  constructor(podcastConfig) {
+  constructor (podcastConfig) {
     PodcastPlayer.podcastConfig = podcastConfig
     for (let name in handlers) {
-      handlers[name].PodcastPlayer = PodcastPlayer
+      if ('PodcastPlayer' in handlers[name]) {
+        handlers[name].PodcastPlayer = PodcastPlayer
+      }
     }
   }
-  build(persistentAdapter) {
+  build (persistentAdapter) {
     return Alexa.SkillBuilders.custom()
       .withPersistenceAdapter(persistentAdapter)
       .addRequestInterceptors(

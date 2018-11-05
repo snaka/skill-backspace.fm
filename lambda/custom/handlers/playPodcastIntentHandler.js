@@ -4,6 +4,9 @@ module.exports = {
   set PodcastPlayer (clazz) {
     PodcastPlayer = clazz
   },
+  get PodcastPlayer () {
+    return PodcastPlayer
+  },
   canHandle (handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'LaunchRequest' ||
       (handlerInput.requestEnvelope.request.type === 'IntentRequest' &&

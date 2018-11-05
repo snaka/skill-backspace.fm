@@ -1,5 +1,4 @@
 module.exports = {
-  set PodcastPlayer (_) { /* do nothing */ },
   canHandle (handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'System.ExceptionEncountered'
   },
