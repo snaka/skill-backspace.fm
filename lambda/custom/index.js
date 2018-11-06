@@ -3,7 +3,7 @@
 'use strict'
 
 const Adapter = require('ask-sdk-dynamodb-persistence-adapter')
-const PodcastSkillBuilder = require('./podcast-skill-builder')
+const PodcastSkillBuilder = require('alexa-podcast-skill-builder')
 const podcastConfig = require('./constants')
 
 const skillBuilder = new PodcastSkillBuilder(podcastConfig)
