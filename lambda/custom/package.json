@@ -10,13 +10,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "alexa-podcast-skill-builder": "https://github.com/snaka/alexa-podcast-skill-builder.git",
+    "alexa-podcast-skill-builder": "git+https://github.com/snaka/alexa-podcast-skill-builder.git",
     "ask-sdk-core": "^2.0.0",
     "ask-sdk-dynamodb-persistence-adapter": "^2.1.0",
     "ask-sdk-model": "^1.0.0"
   },
   "devDependencies": {
-    "alexa-skill-test-framework": "https://github.com/snaka/alexa-skill-test-framework",
+    "alexa-skill-test-framework": "^1.2.4",
     "chai": "^4.2.0",
     "eslint": "^5.2.0",
     "eslint-config-standard": "^11.0.0",
