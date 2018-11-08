@@ -4,5 +4,5 @@ const { podcast } = require('alexa-podcast-skill-builder')
 Object.assign(podcast.config, require('./constants'))
 
 exports.handler = async (event) => {
-  await podcast.getEpisodeInfo(podcast.config.ID, 0, false)
+  await podcast.getEpisodeInfo(podcast.config.podcastId, 0, false)
 }
