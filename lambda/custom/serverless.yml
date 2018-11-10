@@ -6,11 +6,13 @@ plugins:
 
 provider:
   name: aws
-  tracing: true
   region: ap-northeast-1
   runtime: nodejs8.10
   memorySize: 128
   timeout: 30
+  environment:
+    PODCAST_FEED_CACHE_TABLE: backspace-fm-cache-${opt:stage, self:provider.stage}
+    PERSISTENT_STORE_TABLE: backspace-fm-user-${opt:stage, self:provider.stage}
   iamRoleStatements:
     - Effect: "Allow"
       Action:
@@ -48,13 +50,12 @@ package:
 functions:
   main:
     warmup: true
+    tracing: true
     handler: index.handler
     events:
       - alexaSkill:
           appId: ${env:SKILL_ID}
           enabled: true
-    environment:
-      PERSISTENT_STORE_TABLE: alexa-skill-podcasts-player-persistent-store-${opt:stage, self:provider.stage}
   cacheUpdator:
     handler: cacheUpdator.handler
     timeout: 60
