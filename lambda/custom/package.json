@@ -24,7 +24,7 @@
     "eslint-plugin-node": "10.0.0",
     "eslint-plugin-promise": "4.2.1",
     "eslint-plugin-standard": "4.0.1",
-    "mocha": "5.2.0",
+    "mocha": "6.2.2",
     "nock": "9.6.1",
     "serverless-plugin-tracing": "2.0.0",
     "serverless-plugin-warmup": "3.6.2-rc.1"
