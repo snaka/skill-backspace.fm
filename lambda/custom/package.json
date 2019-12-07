@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "alexa-podcast-skill-builder": "git+https://github.com/snaka/alexa-podcast-skill-builder.git",
+    "alexa-podcast-skill-builder": "0.0.5",
     "ask-sdk-core": "^2.0.0",
     "ask-sdk-dynamodb-persistence-adapter": "^2.1.0",
     "ask-sdk-model": "^1.0.0"
