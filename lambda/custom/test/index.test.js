@@ -59,7 +59,7 @@ beforeEach(() => {
   nock('http://feeds.backspace.fm')
     .head('/backspacefm')
     .reply(200, '', {
-      'ETag': '__etag__'
+      ETag: '__etag__'
     })
 
   nock('http://feeds.backspace.fm')
@@ -166,7 +166,7 @@ describe('先頭からを指示', () => {
 })
 
 describe('早送り', () => {
-  const request = alexaTest.getIntentRequest('FastforwardIntent', { 'skipMinutes': 5 })
+  const request = alexaTest.getIntentRequest('FastforwardIntent', { skipMinutes: 5 })
   alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:0', 60000)
 
   alexaTest.test([
@@ -185,7 +185,7 @@ describe('早送り', () => {
 })
 
 describe('巻き戻し', () => {
-  const request = alexaTest.getIntentRequest('RewindIntent', { 'skipMinutes': 5 })
+  const request = alexaTest.getIntentRequest('RewindIntent', { skipMinutes: 5 })
   alexaTest.addAudioPlayerContextToRequest(request, 'backspace.fm:0', 360000)
 
   alexaTest.test([
