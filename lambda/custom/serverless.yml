@@ -7,7 +7,7 @@ plugins:
 provider:
   name: aws
   region: ap-northeast-1
-  runtime: nodejs8.10
+  runtime: nodejs12.x
   memorySize: 128
   timeout: 30
   environment:
