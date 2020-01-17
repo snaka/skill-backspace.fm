@@ -27,6 +27,6 @@
     "mocha": "7.0.0",
     "nock": "11.7.2",
     "serverless-plugin-tracing": "2.0.0",
-    "serverless-plugin-warmup": "4.7.1-rc.1"
+    "serverless-plugin-warmup": "4.8.0"
   }
 }
